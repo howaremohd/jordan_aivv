@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partner Dashboard - JordanAI</title>
+    <meta name="description" content="Manage your Jordanian tourism activities, track live bookings, optimize AI match rankings, and monitor revenue with JordanAI Partner Portal.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#CE1126',
+                        secondary: '#0B0D17',
+                        white: '#FFFFFF',
+                        sand: '#E7D3B5',
+                        sandDark: '#CBB494',
+                        green: '#007A3D',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-heading { font-family: 'Montserrat', sans-serif; }
+        .sidebar-link.active {
+            background-color: #CE1126;
+            color: white;
+            box-shadow: 0 8px 16px -4px rgba(206, 17, 38, 0.4);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+    </style>
+</head>
+<body class="bg-gray-50 text-secondary antialiased min-h-screen flex flex-col">
+
+    <!-- Mobile Top Bar -->
+    <header class="lg:hidden bg-secondary text-white px-5 py-4 flex justify-between items-center sticky top-0 z-40 border-b border-white/10 shadow-md">
+        <a href="index.html" class="text-xl font-bold font-heading tracking-tight flex items-center">
+            Jordan<span class="text-primary">AI</span> 
+            <span class="text-[10px] bg-primary/20 text-primary border border-primary/30 px-2 py-0.5 rounded-full uppercase ml-2 tracking-wide font-bold">Partner</span>
+        </a>
+        <div class="flex items-center space-x-3">
+            <button onclick="openNewActivityModal()" class="bg-primary text-white text-xs px-3 py-1.5 rounded-lg font-bold flex items-center">
+                <i class="fas fa-plus mr-1"></i> Add
+            </button>
+            <button id="mobile-menu-toggle" aria-label="Toggle navigation" class="p-2 text-gray-300 hover:text-white focus:outline-none">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 min-h-[calc(100vh-60px)] lg:min-h-screen relative">
+        
+        <!-- Mobile Sidebar Backdrop -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-black/60 z-40 lg:hidden hidden transition-opacity duration-300"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="main-sidebar" class="fixed lg:sticky top-0 left-0 h-screen w-72 bg-secondary text-white flex flex-col z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out border-r border-white/10">
+            <!-- Brand Header -->
+            <div class="p-6 border-b border-white/10 flex items-center justify-between">
+                <div>
+                    <a href="index.html" class="text-2xl font-bold font-heading tracking-tight flex items-center">
+                        Jordan<span class="text-primary">AI</span> 
+                        <span class="text-[10px] bg-primary/25 text-red-300 border border-primary/40 px-2 py-0.5 rounded uppercase ml-2 font-bold tracking-wider">Partner</span>
+                    </a>
+                    <p class="text-[11px] text-gray-400 mt-1">Host & Experience Operator Portal</p>
+                </div>
+                <button id="close-mobile-sidebar" class="lg:hidden text-gray-400 hover:text-white p-1">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            
+            <!-- Navigation Links -->
+            <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto custom-scrollbar">
+                <div class="px-3 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Management</div>
+                
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-link active w-full flex items-center p-3 rounded-xl transition-all text-left">
+                    <i class="fas fa-th-large w-6 text-base"></i> 
+                    <span class="text-sm font-semibold">Dashboard</span>
+                </button>
+                
+                <button onclick="switchTab('activities')" id="nav-activities" class="sidebar-link w-full flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all text-left">
+                    <i class="fas fa-map-marked-alt w-6 text-base"></i> 
+                    <span class="text-sm font-semibold">My Activities</span>
+                    <span id="active-count-badge" class="ml-auto bg-white/20 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                
+                <button onclick="switchTab('bookings')" id="nav-bookings" class="sidebar-link w-full flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all text-left">
+                    <i class="fas fa-calendar-alt w-6 text-base"></i> 
+                    <span class="text-sm font-semibold">Bookings</span>
+                    <span class="ml-auto bg-green text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+                
+                <button onclick="switchTab('analytics')" id="nav-analytics" class="sidebar-link w-full flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all text-left">
+                    <i class="fas fa-chart-line w-6 text-base"></i> 
+                    <span class="text-sm font-semibold">AI Analytics</span>
+                </button>
+                
+                <button onclick="switchTab('messages')" id="nav-messages" class="sidebar-link w-full flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all text-left">
+                    <i class="fas fa-comment-dots w-6 text-base"></i> 
+                    <span class="text-sm font-semibold">Messages</span>
+                    <span class="ml-auto bg-primary text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </button>
+
+                <div class="pt-6 px-3 pb-2 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Portal Shortcuts</div>
+                
+                <a href="index.html" class="flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all">
+                    <i class="fas fa-globe w-6 text-base text-sand"></i> 
+                    <span class="text-sm font-medium">Public Homepage</span>
+                </a>
+                
+                <a href="discovery.html" class="flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all">
+                    <i class="fas fa-compass w-6 text-base text-sand"></i> 
+                    <span class="text-sm font-medium">Discover Experiences</span>
+                </a>
+
+                <a href="dashboard.html" class="flex items-center p-3 rounded-xl hover:bg-white/10 text-gray-300 hover:text-white transition-all">
+                    <i class="fas fa-user-circle w-6 text-base text-sand"></i> 
+                    <span class="text-sm font-medium">Customer View</span>
+                </a>
+            </nav>
+            
+            <!-- Partner Profile Footer Card -->
+            <div class="p-5 border-t border-white/10 bg-black/40">
+                <div class="flex items-center space-x-3 mb-3">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=120&auto=format&fit=crop&q=80" alt="Wadi Adventures Avatar" class="w-11 h-11 rounded-full object-cover border-2 border-primary">
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green border-2 border-secondary rounded-full" title="Online & accepting bookings"></span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-bold truncate">Wadi Adventures</p>
+                        <p class="text-[11px] text-green flex items-center font-semibold">
+                            <i class="fas fa-check-circle mr-1"></i> Verified Operator
+                        </p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-gray-400 pt-2 border-t border-white/5">
+                    <span>Vendor ID: <strong class="text-gray-200">#JO-4091</strong></span>
+                    <div class="flex items-center space-x-2.5">
+                        <button onclick="showToast('Profile settings saved!')" class="text-gray-400 hover:text-sand transition-colors" title="Settings">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                        <a href="login.html" class="text-gray-400 hover:text-primary transition-colors" title="Log Out / Sign In Portal">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 p-6 md:p-10 lg:p-12 overflow-y-auto">
+
+            <!-- TAB 1: DASHBOARD OVERVIEW -->
+            <section id="tab-dashboard" class="tab-content active">
+                <header class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8">
+                    <div>
+                        <div class="flex items-center space-x-2 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+                            <span>Partner Workspace</span>
+                            <span>•</span>
+                            <span class="text-green flex items-center"><span class="w-2 h-2 rounded-full bg-green inline-block mr-1"></span> Live on JordanAI Engine</span>
+                        </div>
+                        <h1 class="text-2xl md:text-3xl font-bold font-heading text-secondary">Welcome back, Wadi Adventures</h1>
+                        <p class="text-gray-600 text-sm mt-1">Your tourism activities have seen a <span class="text-green font-bold bg-green/10 px-2 py-0.5 rounded-md"><i class="fas fa-arrow-trend-up mr-1"></i>+15% increase</span> in AI matching this week.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="switchTab('bookings')" class="border border-gray-200 bg-white text-secondary px-4 py-3 rounded-xl font-semibold text-sm hover:bg-gray-50 transition shadow-sm flex items-center">
+                            <i class="fas fa-calendar-check mr-2 text-primary"></i> View 6 New Bookings
+                        </button>
+                        <button onclick="openNewActivityModal()" class="bg-primary hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center shadow-lg shadow-primary/25 hover:scale-105 active:scale-95 transition-all">
+                            <i class="fas fa-plus mr-2"></i> List New Activity
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Stats Overview Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Bookings</p>
+                            <span class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-sm"><i class="fas fa-ticket-alt"></i></span>
+                        </div>
+                        <p class="text-3xl font-extrabold font-heading text-secondary">0</p>
+                        <div class="flex items-center justify-between mt-3 text-xs">
+                            <span class="text-gray-400 font-bold flex items-center"><i class="fas fa-minus mr-1"></i> 0% vs last month</span>
+                            <span class="text-gray-400">Past 30 days</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Net Revenue</p>
+                            <span class="w-8 h-8 rounded-lg bg-green/10 text-green flex items-center justify-center text-sm"><i class="fas fa-dollar-sign"></i></span>
+                        </div>
+                        <p class="text-3xl font-extrabold font-heading text-secondary">$0</p>
+                        <div class="flex items-center justify-between mt-3 text-xs">
+                            <span class="text-gray-400 font-bold flex items-center"><i class="fas fa-minus mr-1"></i> 0% vs last month</span>
+                            <span class="text-gray-400 font-medium">0 JOD</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">AI Match Score</p>
+                            <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm"><i class="fas fa-wand-magic-sparkles"></i></span>
+                        </div>
+                        <p class="text-3xl font-extrabold font-heading text-secondary">0%</p>
+                        <div class="flex items-center justify-between mt-3 text-xs">
+                            <span class="text-primary font-bold">New Partner Account</span>
+                            <span class="text-gray-400">Ready for listings</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition">
+                        <div class="flex justify-between items-start mb-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Avg. Rating</p>
+                            <span class="w-8 h-8 rounded-lg bg-yellow-50 text-yellow-600 flex items-center justify-center text-sm"><i class="fas fa-star"></i></span>
+                        </div>
+                        <div class="flex items-baseline space-x-2">
+                            <p class="text-3xl font-extrabold font-heading text-secondary">0.0</p>
+                            <span class="text-xs text-gray-400 font-medium">(0 reviews)</span>
+                        </div>
+                        <div class="flex items-center justify-between mt-3 text-xs">
+                            <div class="flex text-gray-300 space-x-0.5">
+                                <i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-400 font-semibold">New Host</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Chart & Active Listings -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+                    
+                    <!-- Revenue & Bookings Chart -->
+                    <div class="lg:col-span-2 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+                            <div>
+                                <h2 class="text-xl font-bold font-heading text-secondary">Booking Performance</h2>
+                                <p class="text-xs text-gray-500 mt-0.5">Automated tracking across AI recommendation pipelines</p>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1 text-xs font-bold">
+                                    <button id="btn-chart-bookings" onclick="changeChartMetric('bookings')" class="px-3 py-1 rounded-md bg-white text-secondary shadow-sm">Bookings</button>
+                                    <button id="btn-chart-revenue" onclick="changeChartMetric('revenue')" class="px-3 py-1 rounded-md text-gray-500 hover:text-secondary">Revenue ($)</button>
+                                </div>
+                                <select id="chart-timeframe" onchange="updateChartTimeframe(this.value)" class="bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold px-3 py-1.5 outline-none text-gray-700 cursor-pointer">
+                                    <option value="30d">Last 30 Days</option>
+                                    <option value="6m">Last 6 Months</option>
+                                    <option value="1y">Year to Date</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="booking-chart" class="h-[340px] w-full"></div>
+                        
+                        <div class="grid grid-cols-3 gap-4 pt-6 mt-2 border-t border-gray-100 text-center">
+                            <div>
+                                <p class="text-xs text-gray-400">Peak Conversion Day</p>
+                                <p class="text-sm font-bold text-secondary mt-0.5">Thursday & Friday</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">Fastest Booking Origin</p>
+                                <p class="text-sm font-bold text-secondary mt-0.5">United Kingdom (34%)</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-400">AI Inquiry to Book Rate</p>
+                                <p class="text-sm font-bold text-green mt-0.5">28.4% Conversion</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Listings Sidebar Card -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 class="text-xl font-bold font-heading text-secondary">Active Listings</h2>
+                                    <p class="text-xs text-gray-400">Live experiences catalog</p>
+                                </div>
+                                <span class="bg-green/10 text-green text-xs font-bold px-2.5 py-1 rounded-full">3 Live</span>
+                            </div>
+
+                            <div class="space-y-5" id="mini-listings-container">
+                                <!-- Listing 1 -->
+                                <div class="flex items-center group cursor-pointer p-2.5 rounded-2xl hover:bg-gray-50 transition border border-transparent hover:border-gray-200" onclick="window.location.href='experience-detail.html'">
+                                    <div class="w-16 h-16 rounded-xl overflow-hidden mr-4 relative flex-shrink-0">
+                                        <img class="w-full h-full object-cover transition-transform group-hover:scale-110" src="images/categories/adventure.jpg" alt="Luxury Martian Dome" onerror="this.src='https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_247d966647_772641a37099bb81.png'" />
+                                    </div>
+                                    <div class="flex-1 min-w-0 pr-2">
+                                        <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">Wadi Rum Glamping Dome</h4>
+                                        <p class="text-[11px] text-gray-400 font-semibold">12 bookings this week</p>
+                                        <span class="inline-block mt-1 text-[10px] bg-sand/30 text-secondary font-bold px-1.5 py-0.5 rounded">Wadi Rum</span>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <p class="text-sm font-bold text-secondary">$180</p>
+                                        <span class="inline-flex items-center text-[10px] text-green font-bold"><span class="w-1.5 h-1.5 bg-green rounded-full mr-1"></span>Active</span>
+                                    </div>
+                                </div>
+
+                                <!-- Listing 2 -->
+                                <div class="flex items-center group cursor-pointer p-2.5 rounded-2xl hover:bg-gray-50 transition border border-transparent hover:border-gray-200" onclick="window.location.href='experience-detail.html'">
+                                    <div class="w-16 h-16 rounded-xl overflow-hidden mr-4 relative flex-shrink-0">
+                                        <img class="w-full h-full object-cover transition-transform group-hover:scale-110" src="images/categories/nature.jpg" alt="Sunset Camel Trek" onerror="this.src='https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_e2df99bc23_5cdd22fce73903d4.png'" />
+                                    </div>
+                                    <div class="flex-1 min-w-0 pr-2">
+                                        <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">Sunset Camel Trek & Tea</h4>
+                                        <p class="text-[11px] text-gray-400 font-semibold">45 bookings this week</p>
+                                        <span class="inline-block mt-1 text-[10px] bg-sand/30 text-secondary font-bold px-1.5 py-0.5 rounded">Lawrence Spring</span>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <p class="text-sm font-bold text-secondary">$45</p>
+                                        <span class="inline-flex items-center text-[10px] text-green font-bold"><span class="w-1.5 h-1.5 bg-green rounded-full mr-1"></span>Active</span>
+                                    </div>
+                                </div>
+
+                                <!-- Listing 3 -->
+                                <div class="flex items-center group cursor-pointer p-2.5 rounded-2xl hover:bg-gray-50 transition border border-transparent hover:border-gray-200" onclick="window.location.href='experience-detail.html'">
+                                    <div class="w-16 h-16 rounded-xl overflow-hidden mr-4 relative flex-shrink-0">
+                                        <img class="w-full h-full object-cover transition-transform group-hover:scale-110" src="images/categories/cultural.jpg" alt="Petra Night Tour" onerror="this.src='https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_ea01565b81_7d2c785cdcd47dca.png'" />
+                                    </div>
+                                    <div class="flex-1 min-w-0 pr-2">
+                                        <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">Petra By Night Candle Tour</h4>
+                                        <p class="text-[11px] text-gray-400 font-semibold">8 bookings this week</p>
+                                        <span class="inline-block mt-1 text-[10px] bg-sand/30 text-secondary font-bold px-1.5 py-0.5 rounded">Petra Siq</span>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <p class="text-sm font-bold text-secondary">$25</p>
+                                        <span class="inline-flex items-center text-[10px] text-gray-500 font-bold"><span class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1"></span>Limited</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-6 mt-6 border-t border-gray-100 space-y-3">
+                            <button onclick="switchTab('activities')" class="w-full py-3 bg-gray-50 hover:bg-gray-100 text-secondary rounded-xl text-xs font-bold transition flex items-center justify-center">
+                                Manage All Activities <i class="fas fa-arrow-right ml-2 text-primary"></i>
+                            </button>
+                            <button onclick="openNewActivityModal()" class="w-full py-3 bg-secondary text-white hover:bg-black rounded-xl text-xs font-bold transition flex items-center justify-center">
+                                <i class="fas fa-plus mr-2 text-primary"></i> Add New Package
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Bookings Table Preview -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 md:p-8 flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-gray-100">
+                        <div>
+                            <h2 class="text-xl font-bold font-heading text-secondary">Recent Bookings & Payouts</h2>
+                            <p class="text-xs text-gray-400 mt-0.5">Real-time guest reservations synchronized via AI itinerary requests</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <button onclick="switchTab('bookings')" class="text-primary hover:text-red-700 text-xs font-bold flex items-center">
+                                View Full Booking Ledger <i class="fas fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="bg-gray-50/75 border-b border-gray-100 text-gray-500 text-[11px] font-bold uppercase tracking-wider">
+                                    <th class="py-3.5 px-6">Traveler</th>
+                                    <th class="py-3.5 px-6">Experience</th>
+                                    <th class="py-3.5 px-6">Date & Slot</th>
+                                    <th class="py-3.5 px-6">Guests</th>
+                                    <th class="py-3.5 px-6">Total Payout</th>
+                                    <th class="py-3.5 px-6">AI Match</th>
+                                    <th class="py-3.5 px-6 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50/50 transition">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-full bg-sand/40 text-secondary flex items-center justify-center font-bold text-xs">SJ</div>
+                                            <div>
+                                                <p class="font-bold text-secondary text-sm">Sarah Jenkins</p>
+                                                <p class="text-[11px] text-gray-400">London, UK • Verified</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-secondary">
+                                        Wadi Rum Glamping Dome
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">
+                                        Oct 18, 2026 (Check-in 14:00)
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">2 Adults</td>
+                                    <td class="py-4 px-6 font-bold text-secondary">$360.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="bg-blue-50 text-blue-700 text-[11px] font-bold px-2 py-0.5 rounded-md">98% Match</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green/10 text-green">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green mr-1.5"></span> Confirmed
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50/50 transition">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">MV</div>
+                                            <div>
+                                                <p class="font-bold text-secondary text-sm">Marcus Vance</p>
+                                                <p class="text-[11px] text-gray-400">Zurich, Switzerland</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-secondary">
+                                        Sunset Camel Trek & Tea
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">
+                                        Oct 19, 2026 (Sunset Slot)
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">4 Guests</td>
+                                    <td class="py-4 px-6 font-bold text-secondary">$180.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="bg-blue-50 text-blue-700 text-[11px] font-bold px-2 py-0.5 rounded-md">94% Match</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 mr-1.5"></span> Pending Pickup
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50/50 transition">
+                                    <td class="py-4 px-6">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-full bg-purple-50 text-purple-700 flex items-center justify-center font-bold text-xs">ER</div>
+                                            <div>
+                                                <p class="font-bold text-secondary text-sm">Elena Rostova</p>
+                                                <p class="text-[11px] text-gray-400">Milan, Italy</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-6 font-semibold text-secondary">
+                                        Petra By Night Candle Tour
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">
+                                        Oct 21, 2026 (20:30)
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">2 Adults</td>
+                                    <td class="py-4 px-6 font-bold text-secondary">$50.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="bg-blue-50 text-blue-700 text-[11px] font-bold px-2 py-0.5 rounded-md">91% Match</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green/10 text-green">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green mr-1.5"></span> Confirmed
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- TAB 2: MY ACTIVITIES -->
+            <section id="tab-activities" class="tab-content">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold font-heading text-secondary">My Tourism Activities</h2>
+                        <p class="text-gray-500 text-sm mt-1">Manage listings, optimize AI tags, adjust pricing, and review availability.</p>
+                    </div>
+                    <button onclick="openNewActivityModal()" class="bg-primary hover:bg-red-700 text-white px-6 py-3 rounded-xl font-bold text-sm flex items-center shadow-lg shadow-primary/25 transition">
+                        <i class="fas fa-plus mr-2"></i> Add New Activity
+                    </button>
+                </div>
+
+                <!-- Filters & Search -->
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div class="relative w-full md:w-80">
+                        <i class="fas fa-search absolute left-4 top-3.5 text-gray-400 text-sm"></i>
+                        <input type="text" id="activity-search-input" onkeyup="filterActivitiesList()" placeholder="Search activities..." class="w-full pl-10 pr-4 py-2 bg-gray-50 rounded-xl text-sm border border-transparent focus:border-primary focus:bg-white outline-none">
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                        <button onclick="filterActivityCategory('all', this)" class="category-filter-btn active px-3.5 py-1.5 rounded-lg text-xs font-bold bg-secondary text-white transition">All Categories</button>
+                        <button onclick="filterActivityCategory('desert', this)" class="category-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Desert & Camping</button>
+                        <button onclick="filterActivityCategory('historical', this)" class="category-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Historical</button>
+                        <button onclick="filterActivityCategory('wellness', this)" class="category-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Wellness</button>
+                    </div>
+                </div>
+
+                <!-- Activities Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="activities-cards-grid">
+                    
+                    <!-- Card 1 -->
+                    <div class="activity-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all flex flex-col justify-between" data-category="desert">
+                        <div>
+                            <div class="relative h-48 w-full overflow-hidden">
+                                <img src="images/categories/adventure.jpg" alt="Wadi Rum Glamping" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-secondary shadow-sm">
+                                    $180 <span class="text-[10px] text-gray-500 font-normal">/ night</span>
+                                </div>
+                                <div class="absolute top-3 left-3 bg-secondary/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-bold text-sand uppercase tracking-wider">
+                                    <i class="fas fa-sparkles text-primary mr-1"></i> 98% AI Match
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center space-x-2 text-xs text-gray-400 mb-1 font-semibold">
+                                    <span><i class="fas fa-map-marker-alt text-primary mr-1"></i> Wadi Rum Protected Area</span>
+                                </div>
+                                <h3 class="text-lg font-bold font-heading text-secondary mb-2">Wadi Rum Glamping Dome</h3>
+                                <p class="text-xs text-gray-500 line-clamp-2 mb-4">Transparent luxury geodesic dome with telescope star gazing, authentic Bedouin dinner buffet, and sunrise camel ride.</p>
+                                
+                                <div class="flex flex-wrap gap-1.5 mb-4">
+                                    <span class="text-[10px] bg-red-50 text-primary font-bold px-2 py-0.5 rounded">Star Gazing</span>
+                                    <span class="text-[10px] bg-sand/30 text-secondary font-bold px-2 py-0.5 rounded">Glamping</span>
+                                    <span class="text-[10px] bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded">Dinner Included</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 text-xs py-3 border-y border-gray-100">
+                                    <div>
+                                        <span class="text-gray-400 block text-[10px]">Weekly Bookings</span>
+                                        <strong class="text-secondary">12 reservations</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400 block text-[10px]">Gross Revenue</span>
+                                        <strong class="text-green">$4,320.00</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50/70 border-t border-gray-100 flex items-center justify-between">
+                            <a href="experience-detail.html" class="text-xs font-bold text-secondary hover:text-primary transition flex items-center">
+                                <i class="fas fa-external-link-alt mr-1.5"></i> Public Preview
+                            </a>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="showToast('Listing updated successfully!')" class="p-2 text-gray-500 hover:text-secondary rounded-lg hover:bg-white transition" title="Edit Listing">
+                                    <i class="fas fa-pen text-xs"></i>
+                                </button>
+                                <button onclick="toggleListingStatus(this)" class="p-2 text-green hover:text-green-700 rounded-lg hover:bg-white transition" title="Toggle Active">
+                                    <i class="fas fa-power-off text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="activity-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all flex flex-col justify-between" data-category="desert">
+                        <div>
+                            <div class="relative h-48 w-full overflow-hidden">
+                                <img src="images/categories/nature.jpg" alt="Sunset Camel Trek" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-secondary shadow-sm">
+                                    $45 <span class="text-[10px] text-gray-500 font-normal">/ person</span>
+                                </div>
+                                <div class="absolute top-3 left-3 bg-secondary/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-bold text-sand uppercase tracking-wider">
+                                    <i class="fas fa-sparkles text-primary mr-1"></i> 94% AI Match
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center space-x-2 text-xs text-gray-400 mb-1 font-semibold">
+                                    <span><i class="fas fa-map-marker-alt text-primary mr-1"></i> Lawrence Spring, Rum</span>
+                                </div>
+                                <h3 class="text-lg font-bold font-heading text-secondary mb-2">Sunset Camel Trek & Bedouin Tea</h3>
+                                <p class="text-xs text-gray-500 line-clamp-2 mb-4">A gentle 2-hour guided camel caravan across red dunes culminating in traditional campfire sage tea as the sun dips below rock arches.</p>
+                                
+                                <div class="flex flex-wrap gap-1.5 mb-4">
+                                    <span class="text-[10px] bg-red-50 text-primary font-bold px-2 py-0.5 rounded">Camel Trek</span>
+                                    <span class="text-[10px] bg-sand/30 text-secondary font-bold px-2 py-0.5 rounded">Sunset</span>
+                                    <span class="text-[10px] bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded">Tea Tasting</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 text-xs py-3 border-y border-gray-100">
+                                    <div>
+                                        <span class="text-gray-400 block text-[10px]">Weekly Bookings</span>
+                                        <strong class="text-secondary">45 reservations</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400 block text-[10px]">Gross Revenue</span>
+                                        <strong class="text-green">$2,025.00</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50/70 border-t border-gray-100 flex items-center justify-between">
+                            <a href="experience-detail.html" class="text-xs font-bold text-secondary hover:text-primary transition flex items-center">
+                                <i class="fas fa-external-link-alt mr-1.5"></i> Public Preview
+                            </a>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="showToast('Listing updated successfully!')" class="p-2 text-gray-500 hover:text-secondary rounded-lg hover:bg-white transition" title="Edit Listing">
+                                    <i class="fas fa-pen text-xs"></i>
+                                </button>
+                                <button onclick="toggleListingStatus(this)" class="p-2 text-green hover:text-green-700 rounded-lg hover:bg-white transition" title="Toggle Active">
+                                    <i class="fas fa-power-off text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="activity-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all flex flex-col justify-between" data-category="historical">
+                        <div>
+                            <div class="relative h-48 w-full overflow-hidden">
+                                <img src="images/categories/cultural.jpg" alt="Petra Candle Tour" class="w-full h-full object-cover">
+                                <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-secondary shadow-sm">
+                                    $25 <span class="text-[10px] text-gray-500 font-normal">/ person</span>
+                                </div>
+                                <div class="absolute top-3 left-3 bg-secondary/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-bold text-sand uppercase tracking-wider">
+                                    <i class="fas fa-sparkles text-primary mr-1"></i> 91% AI Match
+                                </div>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center space-x-2 text-xs text-gray-400 mb-1 font-semibold">
+                                    <span><i class="fas fa-map-marker-alt text-primary mr-1"></i> Petra Treasury Siq</span>
+                                </div>
+                                <h3 class="text-lg font-bold font-heading text-secondary mb-2">Petra By Night Candle Tour</h3>
+                                <p class="text-xs text-gray-500 line-clamp-2 mb-4">Walk the candlelit canyon pathway to Al-Khazneh under a canopy of stars with live Rababa melodies and Bedouin storytelling.</p>
+                                
+                                <div class="flex flex-wrap gap-1.5 mb-4">
+                                    <span class="text-[10px] bg-red-50 text-primary font-bold px-2 py-0.5 rounded">Petra by Night</span>
+                                    <span class="text-[10px] bg-sand/30 text-secondary font-bold px-2 py-0.5 rounded">Culture</span>
+                                    <span class="text-[10px] bg-gray-100 text-gray-600 font-bold px-2 py-0.5 rounded">Music</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2 text-xs py-3 border-y border-gray-100">
+                                    <div>
+                                        <span class="text-gray-400 block text-[10px]">Weekly Bookings</span>
+                                        <strong class="text-secondary">8 reservations</strong>
+                                    </div>
+                                    <div>
+                                        <span class="text-gray-400 block text-[10px]">Gross Revenue</span>
+                                        <strong class="text-green">$400.00</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-gray-50/70 border-t border-gray-100 flex items-center justify-between">
+                            <a href="experience-detail.html" class="text-xs font-bold text-secondary hover:text-primary transition flex items-center">
+                                <i class="fas fa-external-link-alt mr-1.5"></i> Public Preview
+                            </a>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="showToast('Listing updated successfully!')" class="p-2 text-gray-500 hover:text-secondary rounded-lg hover:bg-white transition" title="Edit Listing">
+                                    <i class="fas fa-pen text-xs"></i>
+                                </button>
+                                <button onclick="toggleListingStatus(this)" class="p-2 text-green hover:text-green-700 rounded-lg hover:bg-white transition" title="Toggle Active">
+                                    <i class="fas fa-power-off text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+
+            <!-- TAB 3: BOOKINGS -->
+            <section id="tab-bookings" class="tab-content">
+                <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-8">
+                    <div>
+                        <h2 class="text-3xl font-bold font-heading text-secondary">All Guest Reservations</h2>
+                        <p class="text-gray-500 text-sm mt-1">Live bookings synchronized across conversational AI and discovery searches.</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="showToast('Exporting booking records as CSV...')" class="border border-gray-200 bg-white hover:bg-gray-50 text-secondary px-4 py-2.5 rounded-xl font-bold text-xs shadow-sm flex items-center">
+                            <i class="fas fa-download mr-2 text-primary"></i> Export CSV
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-4 md:p-6 border-b border-gray-100 flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div class="relative w-full md:w-72">
+                            <i class="fas fa-search absolute left-4 top-3 text-gray-400 text-xs"></i>
+                            <input type="text" id="booking-search" onkeyup="filterBookingsTable()" placeholder="Search guest name or ID..." class="w-full pl-9 pr-4 py-2 bg-gray-50 rounded-xl text-xs border border-transparent focus:border-primary focus:bg-white outline-none">
+                        </div>
+                        <div class="flex items-center space-x-2 text-xs">
+                            <span class="text-gray-400 font-semibold">Filter:</span>
+                            <button onclick="filterBookingStatus('all', this)" class="booking-status-btn active px-3 py-1 rounded-lg font-bold bg-secondary text-white">All (142)</button>
+                            <button onclick="filterBookingStatus('confirmed', this)" class="booking-status-btn px-3 py-1 rounded-lg font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">Confirmed (134)</button>
+                            <button onclick="filterBookingStatus('pending', this)" class="booking-status-btn px-3 py-1 rounded-lg font-bold bg-gray-100 text-gray-600 hover:bg-gray-200">Pending (8)</button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-sm" id="full-bookings-table">
+                            <thead>
+                                <tr class="bg-gray-50/75 border-b border-gray-100 text-gray-500 text-[11px] font-bold uppercase tracking-wider">
+                                    <th class="py-3.5 px-6">ID & Guest</th>
+                                    <th class="py-3.5 px-6">Experience Package</th>
+                                    <th class="py-3.5 px-6">Scheduled Date</th>
+                                    <th class="py-3.5 px-6">Party Size</th>
+                                    <th class="py-3.5 px-6">Net Payout</th>
+                                    <th class="py-3.5 px-6">Status</th>
+                                    <th class="py-3.5 px-6 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100" id="bookings-rows">
+                                <tr class="hover:bg-gray-50/50 transition booking-row" data-status="confirmed">
+                                    <td class="py-4 px-6">
+                                        <p class="text-xs font-mono font-bold text-gray-400">#BK-9481</p>
+                                        <p class="font-bold text-secondary">Sarah Jenkins</p>
+                                        <span class="text-[11px] text-gray-500">sarah.j@gmail.com</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <p class="font-semibold text-secondary">Wadi Rum Glamping Dome</p>
+                                        <span class="text-[11px] text-primary font-bold">Standard Dome + Telescope</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">
+                                        Oct 18, 2026
+                                        <span class="block text-[11px] text-gray-400">2 nights</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">2 Adults</td>
+                                    <td class="py-4 px-6 font-extrabold text-secondary">$360.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green/10 text-green">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green mr-1.5"></span> Confirmed
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right space-x-2">
+                                        <button onclick="showToast('Booking details sent to WhatsApp & Email')" class="p-2 text-gray-400 hover:text-secondary rounded-lg" title="Send Voucher"><i class="fas fa-envelope"></i></button>
+                                        <button onclick="showToast('Viewing ticket QR code')" class="p-2 text-primary hover:text-red-700 rounded-lg" title="Scan QR"><i class="fas fa-qrcode"></i></button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50/50 transition booking-row" data-status="pending">
+                                    <td class="py-4 px-6">
+                                        <p class="text-xs font-mono font-bold text-gray-400">#BK-9482</p>
+                                        <p class="font-bold text-secondary">Marcus Vance</p>
+                                        <span class="text-[11px] text-gray-500">m.vance@techcorp.ch</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <p class="font-semibold text-secondary">Sunset Camel Trek & Tea</p>
+                                        <span class="text-[11px] text-green font-bold">Requires Pickup Transfer</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">
+                                        Oct 19, 2026
+                                        <span class="block text-[11px] text-gray-400">Sunset Slot (16:30)</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">4 Adults</td>
+                                    <td class="py-4 px-6 font-extrabold text-secondary">$180.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 mr-1.5"></span> Needs Confirmation
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right space-x-2">
+                                        <button onclick="approveBooking(this)" class="px-3 py-1 bg-green hover:bg-green-700 text-white rounded-lg text-xs font-bold transition">Accept</button>
+                                    </td>
+                                </tr>
+
+                                <tr class="hover:bg-gray-50/50 transition booking-row" data-status="confirmed">
+                                    <td class="py-4 px-6">
+                                        <p class="text-xs font-mono font-bold text-gray-400">#BK-9483</p>
+                                        <p class="font-bold text-secondary">Elena Rostova</p>
+                                        <span class="text-[11px] text-gray-500">elena.rostova@libero.it</span>
+                                    </td>
+                                    <td class="py-4 px-6">
+                                        <p class="font-semibold text-secondary">Petra By Night Candle Tour</p>
+                                        <span class="text-[11px] text-gray-400 font-medium">Standard Siq Entry</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">
+                                        Oct 21, 2026
+                                        <span class="block text-[11px] text-gray-400">Night slot (20:30)</span>
+                                    </td>
+                                    <td class="py-4 px-6 text-gray-600">2 Adults</td>
+                                    <td class="py-4 px-6 font-extrabold text-secondary">$50.00</td>
+                                    <td class="py-4 px-6">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green/10 text-green">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green mr-1.5"></span> Confirmed
+                                        </span>
+                                    </td>
+                                    <td class="py-4 px-6 text-right space-x-2">
+                                        <button onclick="showToast('Booking details sent')" class="p-2 text-gray-400 hover:text-secondary rounded-lg"><i class="fas fa-envelope"></i></button>
+                                        <button onclick="showToast('Viewing ticket QR code')" class="p-2 text-primary hover:text-red-700 rounded-lg"><i class="fas fa-qrcode"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- TAB 4: AI ANALYTICS -->
+            <section id="tab-analytics" class="tab-content">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-bold font-heading text-secondary">AI Discovery & Ranking Analytics</h2>
+                    <p class="text-gray-500 text-sm mt-1">Deep insights into how the JordanAI Concierge engine highlights and suggests your experiences to tourists.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                    
+                    <!-- AI Match Breakdown -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold font-heading text-secondary">AI Visibility Diagnostic</h3>
+                            <span class="bg-primary/10 text-primary text-xs font-bold px-2.5 py-1 rounded-full">Score: 94 / 100</span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-gray-600">Listing Richness & High-Res Media</span>
+                                    <span class="text-secondary">96%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-primary h-2 rounded-full" style="width: 96%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-gray-600">Traveler Feedback & Star Ratings</span>
+                                    <span class="text-secondary">98%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-yellow-500 h-2 rounded-full" style="width: 98%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-gray-600">Fast Chat Response Time (<15m)</span>
+                                    <span class="text-secondary">90%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-green h-2 rounded-full" style="width: 90%"></div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-bold mb-1">
+                                    <span class="text-gray-600">Fair Price & Value Alignment</span>
+                                    <span class="text-secondary">92%</span>
+                                </div>
+                                <div class="w-full bg-gray-100 rounded-full h-2">
+                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                            <h4 class="text-xs font-bold text-primary uppercase tracking-wider mb-1 flex items-center">
+                                <i class="fas fa-lightbulb mr-1.5"></i> AI Optimization Tip
+                            </h4>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                Travelers frequently request "Zarb Underground Cooking demonstration". Adding this keyword to your Wadi Rum Glamping listing could boost match frequency by +11%.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Visitor Geography -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-bold font-heading text-secondary mb-2">Guest Geographic Demand</h3>
+                        <p class="text-xs text-gray-400 mb-6">Origins of tourists reserving your tours</p>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="flex items-center font-semibold text-secondary">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-600 mr-2"></span> United Kingdom & Western Europe
+                                </span>
+                                <span class="font-bold text-secondary">44%</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="flex items-center font-semibold text-secondary">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-600 mr-2"></span> United States & Canada
+                                </span>
+                                <span class="font-bold text-secondary">32%</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="flex items-center font-semibold text-secondary">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green mr-2"></span> GCC & Arab Gulf
+                                </span>
+                                <span class="font-bold text-secondary">16%</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="flex items-center font-semibold text-secondary">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-sandDark mr-2"></span> Asia-Pacific & Others
+                                </span>
+                                <span class="font-bold text-secondary">8%</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 pt-6 border-t border-gray-100">
+                            <p class="text-xs text-gray-400 mb-1">Upcoming Payout Cycle</p>
+                            <p class="text-2xl font-extrabold font-heading text-secondary">$3,450.00</p>
+                            <p class="text-xs text-green font-semibold mt-1">
+                                <i class="fas fa-building-columns mr-1"></i> Disbursed automatically Oct 15 to Bank of Jordan (••• 4910)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Trending Search Keywords -->
+                    <div class="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold font-heading text-secondary mb-2">High Demand Keywords</h3>
+                            <p class="text-xs text-gray-400 mb-6">What JordanAI travelers are prompting in Jordan right now</p>
+
+                            <div class="space-y-3">
+                                <div class="p-3 bg-gray-50 rounded-xl flex items-center justify-between text-xs">
+                                    <span class="font-bold text-secondary">"Star gazing dome transparent roof"</span>
+                                    <span class="text-green font-bold">+44% queries</span>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-xl flex items-center justify-between text-xs">
+                                    <span class="font-bold text-secondary">"Beduin herbal tea recipe camp"</span>
+                                    <span class="text-green font-bold">+29% queries</span>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-xl flex items-center justify-between text-xs">
+                                    <span class="font-bold text-secondary">"Petra candlelight music show"</span>
+                                    <span class="text-green font-bold">+18% queries</span>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-xl flex items-center justify-between text-xs">
+                                    <span class="font-bold text-secondary">"4x4 desert safari sand dunes"</span>
+                                    <span class="text-green font-bold">+15% queries</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="showToast('Keyword suggestions added to your draft listings!')" class="mt-6 w-full py-3 bg-primary text-white rounded-xl text-xs font-bold hover:bg-red-700 transition">
+                            Apply Keywords to Listings
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- TAB 5: MESSAGES -->
+            <section id="tab-messages" class="tab-content">
+                <div class="mb-6">
+                    <h2 class="text-3xl font-bold font-heading text-secondary">Guest Inquiries & Messages</h2>
+                    <p class="text-gray-500 text-sm mt-1">Communicate directly with international guests who reserved your activities.</p>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[550px]">
+                    <!-- Conversations list -->
+                    <div class="border-r border-gray-100 divide-y divide-gray-100">
+                        <div class="p-4 bg-gray-50/70 border-b border-gray-100">
+                            <input type="text" placeholder="Search conversations..." class="w-full px-3 py-2 bg-white rounded-xl text-xs border border-gray-200 outline-none">
+                        </div>
+                        <div class="p-4 bg-primary/5 cursor-pointer hover:bg-primary/10 transition flex items-start space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-sand/60 text-secondary font-bold flex items-center justify-center flex-shrink-0">SJ</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-baseline">
+                                    <h4 class="text-xs font-bold text-secondary truncate">Sarah Jenkins</h4>
+                                    <span class="text-[10px] text-gray-400">10:14 AM</span>
+                                </div>
+                                <p class="text-xs text-gray-500 truncate mt-0.5 font-semibold text-secondary">Is pickup from Aqaba airport included?</p>
+                                <span class="inline-block mt-1 text-[10px] bg-primary text-white px-2 py-0.2 rounded-full font-bold">New</span>
+                            </div>
+                        </div>
+                        <div class="p-4 cursor-pointer hover:bg-gray-50 transition flex items-start space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-700 font-bold flex items-center justify-center flex-shrink-0">MV</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-baseline">
+                                    <h4 class="text-xs font-bold text-secondary truncate">Marcus Vance</h4>
+                                    <span class="text-[10px] text-gray-400">Yesterday</span>
+                                </div>
+                                <p class="text-xs text-gray-500 truncate mt-0.5">We have 2 vegetarians in our group for dinner.</p>
+                            </div>
+                        </div>
+                        <div class="p-4 cursor-pointer hover:bg-gray-50 transition flex items-start space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-700 font-bold flex items-center justify-center flex-shrink-0">ER</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-baseline">
+                                    <h4 class="text-xs font-bold text-secondary truncate">Elena Rostova</h4>
+                                    <span class="text-[10px] text-gray-400">Oct 8</span>
+                                </div>
+                                <p class="text-xs text-gray-500 truncate mt-0.5">Thank you, see you next week at Petra!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat Window -->
+                    <div class="md:col-span-2 flex flex-col justify-between h-[550px] bg-gray-50/30">
+                        <div class="p-4 border-b border-gray-100 bg-white flex justify-between items-center">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-9 h-9 rounded-full bg-sand/60 text-secondary font-bold flex items-center justify-center text-xs">SJ</div>
+                                <div>
+                                    <h4 class="text-sm font-bold text-secondary">Sarah Jenkins</h4>
+                                    <p class="text-[11px] text-gray-400">Booking: #BK-9481 (Wadi Rum Glamping Dome, Oct 18)</p>
+                                </div>
+                            </div>
+                            <a href="experience-detail.html" class="text-xs text-primary font-bold hover:underline">View Reserved Experience</a>
+                        </div>
+
+                        <!-- Chat Messages Stream -->
+                        <div class="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar" id="chat-messages-container">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-sand/60 text-secondary font-bold flex items-center justify-center text-xs flex-shrink-0">SJ</div>
+                                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-md text-xs text-secondary leading-relaxed">
+                                    Hello! We are flying into King Hussein International Airport in Aqaba around noon on Oct 18. Does the dome booking include shuttle transport, or can we arrange private 4x4 pickup?
+                                </div>
+                            </div>
+
+                            <div class="flex items-start justify-end space-x-3">
+                                <div class="bg-secondary text-white p-3.5 rounded-2xl rounded-tr-none shadow-sm max-w-md text-xs leading-relaxed">
+                                    Marhaba Sarah! Welcome to Jordan. Yes, our private 4x4 transport will meet you directly at the Wadi Rum Visitor Center. We also offer Aqaba airport pickup for $35 per vehicle. Would you like me to reserve the driver for noon?
+                                </div>
+                            </div>
+
+                            <div class="flex items-start space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-sand/60 text-secondary font-bold flex items-center justify-center text-xs flex-shrink-0">SJ</div>
+                                <div class="bg-white p-3.5 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 max-w-md text-xs text-secondary leading-relaxed">
+                                    That would be wonderful! Please confirm the driver for 12:30 PM. Thank you!
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reply Input -->
+                        <div class="p-4 bg-white border-t border-gray-100">
+                            <form onsubmit="handleSendReply(event)" class="flex items-center space-x-2">
+                                <input type="text" id="chat-reply-input" placeholder="Type your response to Sarah Jenkins..." class="flex-1 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-primary outline-none" required>
+                                <button type="submit" class="bg-primary hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center">
+                                    <i class="fas fa-paper-plane mr-1.5"></i> Send
+                                </button>
+                            </form>
+                            <div class="flex items-center space-x-2 mt-2">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">Quick Replies:</span>
+                                <button onclick="quickReply('Driver confirmed for 12:30 PM with your name sign.')" class="text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-0.5 rounded">Confirm Driver</button>
+                                <button onclick="quickReply('Vegetarian & vegan Bedouin dinner options are fully available.')" class="text-[10px] bg-gray-100 hover:bg-gray-200 text-gray-600 px-2 py-0.5 rounded">Dietary Noted</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: LIST NEW ACTIVITY -->
+    <div id="modal-new-activity" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 shadow-2xl border border-gray-100 custom-scrollbar animate-scaleUp">
+            <div class="flex justify-between items-center pb-4 mb-6 border-b border-gray-100">
+                <div>
+                    <h3 class="text-2xl font-bold font-heading text-secondary">List New Tourism Activity</h3>
+                    <p class="text-xs text-gray-500">Provide details so JordanAI can match you with incoming travelers.</p>
+                </div>
+                <button onclick="closeNewActivityModal()" class="text-gray-400 hover:text-secondary p-2 rounded-lg text-lg">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="form-new-activity" onsubmit="handleCreateActivity(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Activity Title *</label>
+                    <input type="text" id="new-act-title" required placeholder="e.g., Dana Biosphere Sunset Hike & Tea" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Destination / Region *</label>
+                        <select id="new-act-region" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none">
+                            <option value="Wadi Rum">Wadi Rum</option>
+                            <option value="Petra">Petra</option>
+                            <option value="Dead Sea">Dead Sea</option>
+                            <option value="Aqaba">Aqaba & Red Sea</option>
+                            <option value="Dana Reserve">Dana Reserve</option>
+                            <option value="Amman">Amman</option>
+                            <option value="Jerash">Jerash</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Category *</label>
+                        <select id="new-act-category" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none">
+                            <option value="desert">Desert & Adventure</option>
+                            <option value="historical">Historical & Cultural</option>
+                            <option value="wellness">Wellness & Relaxation</option>
+                            <option value="dining">Culinary & Dining</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Price Per Person (USD) *</label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-2.5 text-gray-400 font-bold">$</span>
+                            <input type="number" id="new-act-price" required min="5" value="65" class="w-full pl-8 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Duration *</label>
+                        <input type="text" id="new-act-duration" required placeholder="e.g. 3 Hours, Half-Day, Overnight" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none">
+                    </div>
+                </div>
+
+                <!-- Experience Photos Section -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider">Experience Pictures & Media *</label>
+                        <span id="photo-count-indicator" class="text-[11px] text-gray-400 font-semibold">1 Cover Selected</span>
+                    </div>
+
+                    <!-- Photo Source Switcher Tabs -->
+                    <div class="flex space-x-1 p-1 bg-gray-100 rounded-xl mb-3 text-xs font-bold">
+                        <button type="button" id="tab-btn-upload" onclick="switchPhotoTab('upload')" class="flex-1 py-1.5 px-3 rounded-lg bg-white text-secondary shadow-sm transition">
+                            <i class="fas fa-arrow-up-from-bracket mr-1.5 text-primary"></i> Upload Device
+                        </button>
+                        <button type="button" id="tab-btn-presets" onclick="switchPhotoTab('presets')" class="flex-1 py-1.5 px-3 rounded-lg text-gray-500 hover:text-secondary transition">
+                            <i class="fas fa-images mr-1.5"></i> Jordan Presets
+                        </button>
+                        <button type="button" id="tab-btn-url" onclick="switchPhotoTab('url')" class="flex-1 py-1.5 px-3 rounded-lg text-gray-500 hover:text-secondary transition">
+                            <i class="fas fa-link mr-1.5"></i> Image URL
+                        </button>
+                    </div>
+
+                    <!-- Panel 1: Device Upload (Drag & Drop) -->
+                    <div id="photo-panel-upload" class="space-y-3">
+                        <div id="image-dropzone" onclick="document.getElementById('new-act-file-input').click()" 
+                            class="border-2 border-dashed border-gray-200 hover:border-primary/60 bg-gray-50/70 hover:bg-red-50/20 rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 group">
+                            <input type="file" id="new-act-file-input" accept="image/*" multiple class="hidden" onchange="handleActivityPhotoUpload(event)">
+                            <div class="w-12 h-12 mx-auto mb-2 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                <i class="fas fa-cloud-arrow-up text-xl"></i>
+                            </div>
+                            <p class="text-xs font-bold text-secondary group-hover:text-primary transition-colors">Click to upload pictures or drag & drop</p>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Supports high-res JPG, PNG, WEBP (Multiple pictures allowed)</p>
+                        </div>
+                    </div>
+
+                    <!-- Panel 2: Jordan Presets -->
+                    <div id="photo-panel-presets" class="hidden space-y-2">
+                        <p class="text-[11px] text-gray-500 font-medium mb-2">Click to select an authentic high-resolution Jordan photography asset:</p>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div onclick="selectPresetPhoto('images/categories/adventure.jpg', 'Wadi Rum Dunes', this)" class="preset-photo-card active relative h-20 rounded-xl overflow-hidden cursor-pointer border-2 border-primary shadow-sm group">
+                                <img src="images/categories/adventure.jpg" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] text-white font-bold">Wadi Rum Dunes</span>
+                                </div>
+                                <span class="preset-check absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white flex items-center justify-center text-[8px] font-bold"><i class="fas fa-check"></i></span>
+                            </div>
+
+                            <div onclick="selectPresetPhoto('images/categories/nature.jpg', 'Canyon Nature', this)" class="preset-photo-card relative h-20 rounded-xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-primary/50 group">
+                                <img src="images/categories/nature.jpg" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] text-white font-bold">Canyon Nature</span>
+                                </div>
+                                <span class="preset-check absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white hidden items-center justify-center text-[8px] font-bold"><i class="fas fa-check"></i></span>
+                            </div>
+
+                            <div onclick="selectPresetPhoto('images/categories/cultural.jpg', 'Petra Siq & Treasury', this)" class="preset-photo-card relative h-20 rounded-xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-primary/50 group">
+                                <img src="images/categories/cultural.jpg" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] text-white font-bold">Petra Heritage</span>
+                                </div>
+                                <span class="preset-check absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white hidden items-center justify-center text-[8px] font-bold"><i class="fas fa-check"></i></span>
+                            </div>
+
+                            <div onclick="selectPresetPhoto('images/categories/water.jpg', 'Dead Sea Waters', this)" class="preset-photo-card relative h-20 rounded-xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-primary/50 group">
+                                <img src="images/categories/water.jpg" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] text-white font-bold">Dead Sea</span>
+                                </div>
+                                <span class="preset-check absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white hidden items-center justify-center text-[8px] font-bold"><i class="fas fa-check"></i></span>
+                            </div>
+
+                            <div onclick="selectPresetPhoto('images/categories/dining.jpg', 'Bedouin Zarb Feast', this)" class="preset-photo-card relative h-20 rounded-xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-primary/50 group">
+                                <img src="images/categories/dining.jpg" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] text-white font-bold">Bedouin Feast</span>
+                                </div>
+                                <span class="preset-check absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white hidden items-center justify-center text-[8px] font-bold"><i class="fas fa-check"></i></span>
+                            </div>
+
+                            <div onclick="selectPresetPhoto('images/categories/family.jpg', 'Desert Gathering', this)" class="preset-photo-card relative h-20 rounded-xl overflow-hidden cursor-pointer border-2 border-transparent hover:border-primary/50 group">
+                                <img src="images/categories/family.jpg" class="w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-black/40 flex items-center justify-center p-1 text-center">
+                                    <span class="text-[10px] text-white font-bold">Desert Camp</span>
+                                </div>
+                                <span class="preset-check absolute top-1 right-1 w-4 h-4 rounded-full bg-primary text-white hidden items-center justify-center text-[8px] font-bold"><i class="fas fa-check"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel 3: Direct Web Image URL -->
+                    <div id="photo-panel-url" class="hidden space-y-2">
+                        <div class="flex space-x-2">
+                            <input type="url" id="new-act-url-input" placeholder="https://example.com/photo.jpg" class="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-primary outline-none">
+                            <button type="button" onclick="applyPhotoFromUrl()" class="px-4 py-2 bg-secondary text-white rounded-xl text-xs font-bold hover:bg-black transition">Preview</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Image Previews Container -->
+                    <div id="selected-photos-preview-wrap" class="mt-3 space-y-2">
+                        <!-- Primary Cover Card -->
+                        <div class="relative rounded-2xl overflow-hidden border border-gray-200 bg-gray-50 shadow-sm">
+                            <img id="primary-cover-img" src="images/categories/adventure.jpg" alt="Primary Cover Preview" class="w-full h-44 object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end justify-between p-3.5">
+                                <div>
+                                    <span class="bg-primary text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded tracking-wider shadow">Primary Cover Photo</span>
+                                    <p id="primary-cover-name" class="text-xs text-white font-bold mt-1 truncate max-w-[240px]">Wadi Rum Red Sand Dunes</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button type="button" onclick="document.getElementById('new-act-file-input').click()" class="bg-white/90 hover:bg-white text-secondary text-xs px-2.5 py-1.5 rounded-lg font-bold shadow transition flex items-center">
+                                        <i class="fas fa-camera mr-1 text-primary"></i> Change
+                                    </button>
+                                    <button type="button" onclick="resetCoverPhoto()" class="bg-red-600/90 hover:bg-red-600 text-white text-xs px-2.5 py-1.5 rounded-lg font-bold shadow transition flex items-center">
+                                        <i class="fas fa-trash-alt mr-1"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gallery Thumbnails Strip (If multiple pictures uploaded) -->
+                        <div id="gallery-thumbs-row" class="hidden flex items-center space-x-2 overflow-x-auto py-1"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Experience Description *</label>
+                    <textarea id="new-act-desc" rows="3" required placeholder="Describe what makes this experience memorable, what is included, and meeting points..." class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">AI Match Keywords (comma separated)</label>
+                    <input type="text" id="new-act-tags" placeholder="e.g. Sunset, Local Guide, Telescope, Herbal Tea" value="Authentic, Local Guide, Sunset, Tea" class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:border-primary outline-none">
+                </div>
+
+                <div class="pt-4 border-t border-gray-100 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closeNewActivityModal()" class="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-xs hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-6 py-2.5 rounded-xl bg-primary hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-primary/20 transition flex items-center">
+                        <i class="fas fa-check mr-2"></i> Publish Listing
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Chart Data State
+        let currentMetric = 'bookings';
+        let currentTimeframe = '30d';
+
+        const chartDatasets = {
+            '30d': {
+                dates: ['Oct 1', 'Oct 3', 'Oct 6', 'Oct 9', 'Oct 12', 'Oct 15', 'Oct 18', 'Oct 21', 'Oct 24', 'Oct 27', 'Oct 30'],
+                bookings: [8, 14, 11, 19, 16, 24, 28, 22, 29, 34, 31],
+                revenue: [1200, 2100, 1650, 2900, 2400, 3800, 4300, 3500, 4600, 5200, 4800]
+            },
+            '6m': {
+                dates: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                bookings: [92, 115, 104, 138, 126, 142],
+                revenue: [14500, 18900, 16800, 22300, 20400, 24400]
+            },
+            '1y': {
+                dates: ['Jan', 'Mar', 'May', 'Jul', 'Sep', 'Nov'],
+                bookings: [64, 88, 110, 125, 135, 142],
+                revenue: [9800, 13400, 17200, 19800, 21900, 24400]
+            }
+        };
+
+        function renderPlotlyChart() {
+            try {
+                const dataset = chartDatasets[currentTimeframe];
+                const yValues = currentMetric === 'bookings' ? dataset.bookings : dataset.revenue;
+                const lineColor = '#CE1126';
+                const fillColor = 'rgba(206, 17, 38, 0.08)';
+
+                const data = [{
+                    x: dataset.dates,
+                    y: yValues,
+                    type: 'scatter',
+                    mode: 'lines+markers',
+                    name: currentMetric === 'bookings' ? 'Reservations' : 'Revenue ($)',
+                    line: { color: lineColor, width: 3.5, shape: 'spline' },
+                    marker: { color: lineColor, size: 7, symbol: 'circle' },
+                    fill: 'tozeroy',
+                    fillcolor: fillColor
+                }];
+
+                const layout = {
+                    margin: { t: 20, r: 20, b: 40, l: 45 },
+                    font: { family: 'Inter, sans-serif', color: '#6B7280' },
+                    xaxis: { 
+                        gridcolor: '#f3f4f6',
+                        showline: false,
+                        tickfont: { size: 11, color: '#9CA3AF' }
+                    },
+                    yaxis: { 
+                        gridcolor: '#f3f4f6',
+                        showline: false,
+                        tickfont: { size: 11, color: '#9CA3AF' },
+                        tickprefix: currentMetric === 'revenue' ? '$' : ''
+                    },
+                    paper_bgcolor: 'rgba(0,0,0,0)',
+                    plot_bgcolor: 'rgba(0,0,0,0)',
+                    showlegend: false,
+                    hovermode: 'x unified'
+                };
+
+                const config = { responsive: true, displayModeBar: false, displaylogo: false };
+                Plotly.newPlot('booking-chart', data, layout, config);
+            } catch (e) {
+                console.error("Plotly error:", e);
+                const chartEl = document.getElementById('booking-chart');
+                if (chartEl) chartEl.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-sm">Interactive analytics loaded.</div>';
+            }
+        }
+
+        function changeChartMetric(metric) {
+            currentMetric = metric;
+            const btnB = document.getElementById('btn-chart-bookings');
+            const btnR = document.getElementById('btn-chart-revenue');
+            if (metric === 'bookings') {
+                btnB.className = 'px-3 py-1 rounded-md bg-white text-secondary shadow-sm';
+                btnR.className = 'px-3 py-1 rounded-md text-gray-500 hover:text-secondary';
+            } else {
+                btnR.className = 'px-3 py-1 rounded-md bg-white text-secondary shadow-sm';
+                btnB.className = 'px-3 py-1 rounded-md text-gray-500 hover:text-secondary';
+            }
+            renderPlotlyChart();
+        }
+
+        function updateChartTimeframe(timeframe) {
+            currentTimeframe = timeframe;
+            renderPlotlyChart();
+        }
+
+        // Tab Navigation Switcher
+        function switchTab(tabId) {
+            // Update Tab Content
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.remove('active');
+            });
+            const targetSection = document.getElementById('tab-' + tabId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Update Sidebar Link Styling
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+                link.classList.add('text-gray-300', 'hover:text-white', 'hover:bg-white/10');
+            });
+            const activeNav = document.getElementById('nav-' + tabId);
+            if (activeNav) {
+                activeNav.classList.add('active');
+                activeNav.classList.remove('text-gray-300', 'hover:text-white', 'hover:bg-white/10');
+            }
+
+            // Resize Chart if returning to Dashboard
+            if (tabId === 'dashboard') {
+                setTimeout(renderPlotlyChart, 100);
+            }
+
+            // Close mobile menu if open
+            closeMobileSidebar();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Mobile Sidebar Controls
+        const mobileToggle = document.getElementById('mobile-menu-toggle');
+        const mainSidebar = document.getElementById('main-sidebar');
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        const closeMobileSidebarBtn = document.getElementById('close-mobile-sidebar');
+
+        function openMobileSidebar() {
+            mainSidebar.classList.remove('-translate-x-full');
+            sidebarBackdrop.classList.remove('hidden');
+        }
+
+        function closeMobileSidebar() {
+            mainSidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
+        }
+
+        if (mobileToggle) mobileToggle.addEventListener('click', openMobileSidebar);
+        if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+        if (closeMobileSidebarBtn) closeMobileSidebarBtn.addEventListener('click', closeMobileSidebar);
+
+        // Image Upload & Media Management State
+        let currentCoverImage = 'images/categories/adventure.jpg';
+        let currentCoverName = 'Wadi Rum Red Sand Dunes';
+        let galleryImages = [];
+
+        function switchPhotoTab(tab) {
+            const tabs = ['upload', 'presets', 'url'];
+            tabs.forEach(t => {
+                const btn = document.getElementById('tab-btn-' + t);
+                const panel = document.getElementById('photo-panel-' + t);
+                if (t === tab) {
+                    btn.className = 'flex-1 py-1.5 px-3 rounded-lg bg-white text-secondary shadow-sm transition';
+                    panel.classList.remove('hidden');
+                } else {
+                    btn.className = 'flex-1 py-1.5 px-3 rounded-lg text-gray-500 hover:text-secondary transition';
+                    panel.classList.add('hidden');
+                }
+            });
+        }
+
+        function handleActivityPhotoUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            processFilesList(files);
+        }
+
+        function processFilesList(files) {
+            Array.from(files).forEach((file, index) => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target.result;
+                    if (index === 0 && galleryImages.length === 0) {
+                        currentCoverImage = dataUrl;
+                        currentCoverName = file.name;
+                        updateCoverPreviewUI();
+                    } else {
+                        galleryImages.push({ url: dataUrl, name: file.name });
+                        updateGalleryThumbsUI();
+                    }
+                    updatePhotoCounter();
+                };
+                reader.readAsDataURL(file);
+            });
+            showToast(`${files.length} photo(s) selected and processed!`);
+        }
+
+        function updateCoverPreviewUI() {
+            const imgEl = document.getElementById('primary-cover-img');
+            const nameEl = document.getElementById('primary-cover-name');
+            if (imgEl) imgEl.src = currentCoverImage;
+            if (nameEl) nameEl.textContent = currentCoverName;
+        }
+
+        function updateGalleryThumbsUI() {
+            const container = document.getElementById('gallery-thumbs-row');
+            if (!container) return;
+
+            if (galleryImages.length === 0) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            galleryImages.forEach((item, idx) => {
+                const thumb = document.createElement('div');
+                thumb.className = 'relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden border border-gray-200 group';
+                thumb.innerHTML = `
+                    <img src="${item.url}" class="w-full h-full object-cover">
+                    <button type="button" onclick="removeGalleryPhoto(${idx})" class="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-red-600 text-white flex items-center justify-center text-[8px] opacity-0 group-hover:opacity-100 transition shadow">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <button type="button" onclick="makeGalleryCover(${idx})" title="Set as Cover" class="absolute bottom-0 inset-x-0 bg-black/60 text-white text-[8px] text-center font-bold py-0.5 opacity-0 group-hover:opacity-100 transition">
+                        Cover
+                    </button>
+                `;
+                container.appendChild(thumb);
+            });
+        }
+
+        function removeGalleryPhoto(index) {
+            galleryImages.splice(index, 1);
+            updateGalleryThumbsUI();
+            updatePhotoCounter();
+            showToast('Gallery image removed');
+        }
+
+        function makeGalleryCover(index) {
+            const prevCover = { url: currentCoverImage, name: currentCoverName };
+            const selected = galleryImages[index];
+            currentCoverImage = selected.url;
+            currentCoverName = selected.name;
+            galleryImages[index] = prevCover;
+            updateCoverPreviewUI();
+            updateGalleryThumbsUI();
+            showToast('Updated primary cover photo');
+        }
+
+        function updatePhotoCounter() {
+            const indicator = document.getElementById('photo-count-indicator');
+            if (indicator) {
+                const total = 1 + galleryImages.length;
+                indicator.textContent = total === 1 ? '1 Cover Selected' : `1 Cover + ${galleryImages.length} Gallery Photos`;
+            }
+        }
+
+        function selectPresetPhoto(url, name, el) {
+            document.querySelectorAll('.preset-photo-card').forEach(card => {
+                card.classList.remove('border-primary', 'shadow-sm');
+                card.classList.add('border-transparent');
+                const check = card.querySelector('.preset-check');
+                if (check) check.classList.add('hidden');
+            });
+
+            if (el) {
+                el.classList.remove('border-transparent');
+                el.classList.add('border-primary', 'shadow-sm');
+                const check = el.querySelector('.preset-check');
+                if (check) check.classList.remove('hidden');
+            }
+
+            currentCoverImage = url;
+            currentCoverName = name;
+            updateCoverPreviewUI();
+            showToast(`Preset: ${name} selected`);
+        }
+
+        function applyPhotoFromUrl() {
+            const input = document.getElementById('new-act-url-input');
+            const url = input.value.trim();
+            if (!url) {
+                showToast('Please enter a valid image URL');
+                return;
+            }
+
+            const testImg = new Image();
+            testImg.onload = function() {
+                currentCoverImage = url;
+                currentCoverName = 'Custom Web Photo';
+                updateCoverPreviewUI();
+                showToast('Web image loaded successfully!');
+            };
+            testImg.onerror = function() {
+                showToast('Unable to load image from that URL. Check the link.');
+            };
+            testImg.src = url;
+        }
+
+        function resetCoverPhoto() {
+            currentCoverImage = 'images/categories/adventure.jpg';
+            currentCoverName = 'Wadi Rum Red Sand Dunes';
+            galleryImages = [];
+            const fileInput = document.getElementById('new-act-file-input');
+            if (fileInput) fileInput.value = '';
+            updateCoverPreviewUI();
+            updateGalleryThumbsUI();
+            updatePhotoCounter();
+            showToast('Reset photos to default');
+        }
+
+        // Setup Drag & Drop Listeners
+        window.addEventListener('DOMContentLoaded', function() {
+            const dropzone = document.getElementById('image-dropzone');
+            if (dropzone) {
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropzone.classList.add('border-primary', 'bg-red-50/40');
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(eventName => {
+                    dropzone.addEventListener(eventName, (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropzone.classList.remove('border-primary', 'bg-red-50/40');
+                    }, false);
+                });
+
+                dropzone.addEventListener('drop', (e) => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files && files.length > 0) {
+                        processFilesList(files);
+                    }
+                }, false);
+            }
+        });
+
+        // Modal Controls
+        function openNewActivityModal() {
+            document.getElementById('modal-new-activity').classList.remove('hidden');
+        }
+
+        function closeNewActivityModal() {
+            document.getElementById('modal-new-activity').classList.add('hidden');
+        }
+
+        // Create Activity Handler
+        function handleCreateActivity(e) {
+            e.preventDefault();
+            const title = document.getElementById('new-act-title').value;
+            const region = document.getElementById('new-act-region').value;
+            const category = document.getElementById('new-act-category').value;
+            const price = document.getElementById('new-act-price').value;
+            const duration = document.getElementById('new-act-duration').value;
+            const desc = document.getElementById('new-act-desc').value;
+            const image = currentCoverImage;
+
+            // Add new card into grid
+            const grid = document.getElementById('activities-cards-grid');
+            if (grid) {
+                const newCard = document.createElement('div');
+                newCard.className = 'activity-card bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-lg transition-all flex flex-col justify-between';
+                newCard.setAttribute('data-category', category);
+                
+                const galleryBadge = galleryImages.length > 0 ? 
+                    `<div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur px-2 py-0.5 rounded-md text-[10px] font-bold text-white"><i class="fas fa-camera mr-1"></i> +${galleryImages.length} photos</div>` : '';
+
+                newCard.innerHTML = `
+                    <div>
+                        <div class="relative h-48 w-full overflow-hidden">
+                            <img src="${image}" alt="${title}" class="w-full h-full object-cover">
+                            <div class="absolute top-3 right-3 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-xs font-bold text-secondary shadow-sm">
+                                $${price} <span class="text-[10px] text-gray-500 font-normal">/ person</span>
+                            </div>
+                            <div class="absolute top-3 left-3 bg-secondary/80 backdrop-blur px-2.5 py-1 rounded-full text-[10px] font-bold text-sand uppercase tracking-wider">
+                                <i class="fas fa-sparkles text-primary mr-1"></i> 99% AI Match
+                            </div>
+                            ${galleryBadge}
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center space-x-2 text-xs text-gray-400 mb-1 font-semibold">
+                                <span><i class="fas fa-map-marker-alt text-primary mr-1"></i> ${region}</span>
+                            </div>
+                            <h3 class="text-lg font-bold font-heading text-secondary mb-2">${title}</h3>
+                            <p class="text-xs text-gray-500 line-clamp-2 mb-4">${desc}</p>
+                            
+                            <div class="flex flex-wrap gap-1.5 mb-4">
+                                <span class="text-[10px] bg-red-50 text-primary font-bold px-2 py-0.5 rounded">${duration}</span>
+                                <span class="text-[10px] bg-sand/30 text-secondary font-bold px-2 py-0.5 rounded">New Listing</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 text-xs py-3 border-y border-gray-100">
+                                <div>
+                                    <span class="text-gray-400 block text-[10px]">Weekly Bookings</span>
+                                    <strong class="text-secondary">Just Launched</strong>
+                                </div>
+                                <div>
+                                    <span class="text-gray-400 block text-[10px]">Gross Revenue</span>
+                                    <strong class="text-green">$0.00</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-gray-50/70 border-t border-gray-100 flex items-center justify-between">
+                        <a href="experience-detail.html" class="text-xs font-bold text-secondary hover:text-primary transition flex items-center">
+                            <i class="fas fa-external-link-alt mr-1.5"></i> Public Preview
+                        </a>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="showToast('Listing updated!')" class="p-2 text-gray-500 hover:text-secondary rounded-lg hover:bg-white transition"><i class="fas fa-pen text-xs"></i></button>
+                            <button onclick="toggleListingStatus(this)" class="p-2 text-green hover:text-green-700 rounded-lg hover:bg-white transition"><i class="fas fa-power-off text-xs"></i></button>
+                        </div>
+                    </div>
+                `;
+                grid.prepend(newCard);
+            }
+
+            // Also add mini item to the Overview sidebar card
+            const miniContainer = document.getElementById('mini-listings-container');
+            if (miniContainer) {
+                const miniItem = document.createElement('div');
+                miniItem.className = 'flex items-center group cursor-pointer p-2.5 rounded-2xl hover:bg-gray-50 transition border border-transparent hover:border-gray-200';
+                miniItem.setAttribute('onclick', "window.location.href='experience-detail.html'");
+                miniItem.innerHTML = `
+                    <div class="w-16 h-16 rounded-xl overflow-hidden mr-4 relative flex-shrink-0">
+                        <img class="w-full h-full object-cover transition-transform group-hover:scale-110" src="${image}" alt="${title}" />
+                    </div>
+                    <div class="flex-1 min-w-0 pr-2">
+                        <h4 class="text-sm font-bold group-hover:text-primary transition-colors truncate">${title}</h4>
+                        <p class="text-[11px] text-gray-400 font-semibold">Just added</p>
+                        <span class="inline-block mt-1 text-[10px] bg-sand/30 text-secondary font-bold px-1.5 py-0.5 rounded">${region}</span>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-sm font-bold text-secondary">$${price}</p>
+                        <span class="inline-flex items-center text-[10px] text-green font-bold"><span class="w-1.5 h-1.5 bg-green rounded-full mr-1"></span>Active</span>
+                    </div>
+                `;
+                miniContainer.prepend(miniItem);
+            }
+
+            // Update badge count
+            const countBadge = document.getElementById('active-count-badge');
+            if (countBadge) {
+                const current = parseInt(countBadge.textContent) || 3;
+                countBadge.textContent = current + 1;
+            }
+
+            closeNewActivityModal();
+            document.getElementById('form-new-activity').reset();
+            resetCoverPhoto();
+            showToast(`"${title}" published with photos and indexed by JordanAI!`);
+            switchTab('activities');
+        }
+
+        // Toggle Listing Status
+        function toggleListingStatus(btn) {
+            if (btn.classList.contains('text-green')) {
+                btn.classList.remove('text-green', 'hover:text-green-700');
+                btn.classList.add('text-gray-400', 'hover:text-gray-600');
+                showToast('Listing temporarily paused from search recommendations.');
+            } else {
+                btn.classList.remove('text-gray-400', 'hover:text-gray-600');
+                btn.classList.add('text-green', 'hover:text-green-700');
+                showToast('Listing is now active and receiving traveler inquiries.');
+            }
+        }
+
+        // Filter Activities by Category
+        function filterActivityCategory(category, button) {
+            document.querySelectorAll('.category-filter-btn').forEach(btn => {
+                btn.className = 'category-filter-btn px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition';
+            });
+            button.className = 'category-filter-btn active px-3.5 py-1.5 rounded-lg text-xs font-bold bg-secondary text-white transition';
+
+            const cards = document.querySelectorAll('.activity-card');
+            cards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter Activities Search Input
+        function filterActivitiesList() {
+            const query = document.getElementById('activity-search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.activity-card');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        // Bookings Table Filters
+        function filterBookingsTable() {
+            const query = document.getElementById('booking-search').value.toLowerCase();
+            const rows = document.querySelectorAll('#full-bookings-table tbody tr');
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function filterBookingStatus(status, btn) {
+            document.querySelectorAll('.booking-status-btn').forEach(b => {
+                b.className = 'booking-status-btn px-3 py-1 rounded-lg font-bold bg-gray-100 text-gray-600 hover:bg-gray-200';
+            });
+            btn.className = 'booking-status-btn active px-3 py-1 rounded-lg font-bold bg-secondary text-white';
+
+            const rows = document.querySelectorAll('#full-bookings-table tbody tr');
+            rows.forEach(row => {
+                if (status === 'all' || row.getAttribute('data-status') === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        function approveBooking(btn) {
+            const row = btn.closest('tr');
+            row.setAttribute('data-status', 'confirmed');
+            const statusCell = row.querySelector('td:nth-child(6)');
+            statusCell.innerHTML = `
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green/10 text-green">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green mr-1.5"></span> Confirmed
+                </span>
+            `;
+            btn.parentElement.innerHTML = `
+                <button onclick="showToast('Booking voucher sent')" class="p-2 text-gray-400 hover:text-secondary rounded-lg"><i class="fas fa-envelope"></i></button>
+                <button onclick="showToast('Viewing ticket QR code')" class="p-2 text-primary hover:text-red-700 rounded-lg"><i class="fas fa-qrcode"></i></button>
+            `;
+            showToast('Reservation approved & traveler voucher issued!');
+        }
+
+        // Chat Actions
+        function handleSendReply(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-reply-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            const container = document.getElementById('chat-messages-container');
+            const replyEl = document.createElement('div');
+            replyEl.className = 'flex items-start justify-end space-x-3';
+            replyEl.innerHTML = `
+                <div class="bg-secondary text-white p-3.5 rounded-2xl rounded-tr-none shadow-sm max-w-md text-xs leading-relaxed">
+                    ${message}
+                </div>
+            `;
+            container.appendChild(replyEl);
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
+            showToast('Message sent to guest');
+        }
+
+        function quickReply(text) {
+            document.getElementById('chat-reply-input').value = text;
+        }
+
+        // Toast Notification System
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'bg-secondary text-white px-5 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-xs font-semibold pointer-events-auto border border-white/10 transform translate-y-4 opacity-0 transition-all duration-300';
+            toast.innerHTML = `
+                <i class="fas fa-circle-check text-green text-sm"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Initial Load
+        window.addEventListener('load', function() {
+            renderPlotlyChart();
+            window.addEventListener('resize', function() {
+                try {
+                    Plotly.Plots.resize('booking-chart');
+                } catch(e) {}
+            });
+        });
+    </script>
+</body>
+</html>

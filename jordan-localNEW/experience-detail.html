@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wadi Rum Luxury Star-Gazing Experience - JordanAI</title>
+    <meta name="description" content="Immerse in luxury Martian dome camping, astronomy stargazing, and private jeep safaris in Wadi Rum, Jordan.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#CE1126',
+                        secondary: '#000000',
+                        white: '#FFFFFF',
+                        sand: '#E7D3B5',
+                        green: '#007A3D',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; }
+        .hero-gallery-height { height: 540px; }
+    </style>
+</head>
+<body class="bg-white text-secondary min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="w-full bg-white border-b border-gray-100 z-50 px-6 md:px-12 py-5 flex justify-between items-center sticky top-0 shadow-xs">
+        <div class="flex items-center space-x-8">
+            <a href="index.html" class="text-2xl font-extrabold font-heading text-black tracking-tight flex items-center">
+                Jordan<span class="text-primary">AI</span>
+            </a>
+            <div class="hidden md:flex space-x-6 text-gray-600 font-medium text-sm">
+                <a href="index.html#destinations" class="hover:text-primary transition-colors">Destinations</a>
+                <a href="discovery.html" class="hover:text-primary transition-colors">Experiences</a>
+                <a href="dashboard.html" class="hover:text-primary transition-colors">My Bookings</a>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleFavorite(this)" aria-label="Save to favorites" class="bg-gray-50 border border-gray-200 p-2 rounded-full w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                <i class="far fa-heart text-gray-600"></i>
+            </button>
+            <a href="#booking-card" class="bg-primary text-white px-5 py-2.5 rounded-full font-bold text-xs hover:bg-red-700 transition-all shadow-sm">
+                Reserve Now
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Gallery -->
+    <section class="px-6 max-w-7xl mx-auto py-8 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-3 hero-gallery-height rounded-3xl overflow-hidden shadow-sm">
+            <div class="md:col-span-2 md:row-span-2 relative group overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_5580851059_55ca3ae230521864.png" alt="Wadi Rum Luxury Martian dome camp" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+                <span class="absolute bottom-4 left-4 text-white text-xs font-semibold bg-black/40 backdrop-blur px-3 py-1 rounded-md">Martian Dome View</span>
+            </div>
+            <div class="md:col-span-1 md:row-span-1 relative group overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_8573fc2122_d629aaa87e435098.png" alt="Camel caravan in Wadi Rum" />
+            </div>
+            <div class="md:col-span-1 md:row-span-1 relative group overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_c67381bfb7_0390f5cfacfc662b.png" alt="Bedouin tea ceremony" />
+            </div>
+            <div class="md:col-span-2 md:row-span-1 relative group overflow-hidden">
+                <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_e014585fd1_58e4cdc308f1a222.png" alt="Milky way astronomy over Wadi Rum" />
+                <button onclick="alert('Viewing high-resolution gallery of 18 photos from Wadi Rum Desert Reserve!')" class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-md text-black px-4 py-2 rounded-xl text-xs font-bold shadow-lg flex items-center hover:bg-white transition-all">
+                    <i class="fas fa-th-large mr-2 text-primary"></i> Show All 18 Photos
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content & Booking Sidebar -->
+    <main class="max-w-7xl mx-auto px-6 py-6 flex flex-col lg:flex-row gap-12 w-full flex-1">
+        
+        <!-- Left Side: Content -->
+        <article class="flex-1">
+            <div class="flex items-center space-x-2 mb-3">
+                <span class="bg-green/10 text-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">🌿 Eco-Certified</span>
+                <span class="bg-sand text-secondary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">⭐ AI Top Pick</span>
+            </div>
+            <h1 class="text-3xl md:text-4xl font-bold font-heading mb-3">Luxury Star-Gazing Experience & Desert Expedition</h1>
+            <div class="flex flex-wrap items-center gap-4 text-xs text-gray-500 mb-8 pb-6 border-b border-gray-100">
+                <div class="flex items-center"><i class="fas fa-star text-yellow-400 mr-1.5"></i> <span class="font-bold text-black text-sm">4.9</span> (128 verified reviews)</div>
+                <div class="flex items-center"><i class="fas fa-map-marker-alt text-primary mr-1.5"></i> Wadi Rum Protected Area, Jordan</div>
+                <div class="flex items-center"><i class="fas fa-clock text-primary mr-1.5"></i> 2 Days, 1 Night</div>
+            </div>
+
+            <!-- AI Personalization Recap -->
+            <div class="bg-gradient-to-r from-sand/20 to-white rounded-3xl p-6 mb-10 border border-sand/60">
+                <div class="flex items-center mb-3">
+                    <div class="w-9 h-9 bg-primary text-white rounded-xl flex items-center justify-center mr-3 shadow-sm">
+                        <i class="fas fa-wand-magic-sparkles text-sm"></i>
+                    </div>
+                    <h3 class="font-bold font-heading text-base">JordanAI Personalized Match: 98%</h3>
+                </div>
+                <p class="text-sm text-secondary leading-relaxed">
+                    Based on your travel style, this experience balances your preference for <span class="font-bold text-primary">"High Adventure"</span> with an appetite for <span class="font-bold text-primary">"Authentic Bedouin Culture"</span>. Our safety analysis rates this provider 9.9/10 with certified off-road drivers.
+                </p>
+            </div>
+
+            <!-- About Section -->
+            <section class="mb-10">
+                <h2 class="text-2xl font-bold font-heading mb-4">About this Experience</h2>
+                <p class="text-gray-600 text-sm leading-relaxed mb-6">
+                    Immerse yourself in the "Valley of the Moon" with an exclusive stay in a climate-controlled luxury Martian dome. Experience ancient Bedouin hospitality coupled with 5-star comfort. From sunset camel treks across red sand dunes to private astronomer-guided deep space telescope viewing, every detail is engineered for wonder.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <i class="fas fa-utensils text-primary mr-4 text-xl"></i>
+                        <div>
+                            <p class="font-bold text-sm">All Meals Included</p>
+                            <p class="text-xs text-gray-500">Traditional underground Zarb dinner & breakfast buffet</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                        <i class="fas fa-car-side text-primary mr-4 text-xl"></i>
+                        <div>
+                            <p class="font-bold text-sm">Complimentary Pickup</p>
+                            <p class="text-xs text-gray-500">4x4 transfer directly from Wadi Rum Visitor Village</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Itinerary Section -->
+            <section class="mb-10">
+                <h2 class="text-2xl font-bold font-heading mb-6">Curated 2-Day Itinerary</h2>
+                <div class="space-y-6 relative before:absolute before:left-3 before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200">
+                    <div class="relative pl-10">
+                        <div class="absolute left-0 top-1 w-6 h-6 bg-primary rounded-full border-4 border-white shadow-xs"></div>
+                        <h3 class="font-bold text-sm mb-1">Day 1: Arrival & Crimson Sands Expedition</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">Check-in at 2:00 PM. Private 4x4 jeep safari visiting Lawrence's Spring and Khazali Canyon, followed by a sunset camel ride to your dome.</p>
+                    </div>
+                    <div class="relative pl-10">
+                        <div class="absolute left-0 top-1 w-6 h-6 bg-secondary rounded-full border-4 border-white shadow-xs"></div>
+                        <h3 class="font-bold text-sm mb-1">Night 1: Zarb Feast & Stargazing Session</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">Unearth traditional lamb and root vegetables slow-cooked under sand. Enjoy sage tea by the campfire with an astronomer pointing out constellations.</p>
+                    </div>
+                    <div class="relative pl-10">
+                        <div class="absolute left-0 top-1 w-6 h-6 bg-sand border-2 border-secondary rounded-full"></div>
+                        <h3 class="font-bold text-sm mb-1">Day 2: Sunrise Over the Dunes & Return</h3>
+                        <p class="text-xs text-gray-500 leading-relaxed">Early morning coffee with sunrise photography over the desert, gourmet breakfast, and return transfer to the village by 11:00 AM.</p>
+                    </div>
+                </div>
+            </section>
+        </article>
+
+        <!-- Right Side: Booking Widget -->
+        <aside class="w-full lg:w-[400px]">
+            <div id="booking-card" class="sticky top-28 bg-white border border-gray-100 rounded-3xl shadow-xl p-8">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-3xl font-extrabold font-heading text-primary">$180</span>
+                        <span class="text-gray-400 text-xs">/ person</span>
+                    </div>
+                    <div class="text-xs font-bold text-green flex items-center bg-green/10 px-2.5 py-1 rounded-lg">
+                        <i class="fas fa-tag mr-1 text-[10px]"></i> AI Match -5% Applied
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div class="p-4 border border-gray-100 rounded-2xl bg-gray-50/50">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Check-in Date</label>
+                        <div class="flex items-center justify-between font-semibold text-sm">
+                            <input id="checkin-date" type="date" value="2026-06-18" class="bg-transparent outline-none w-full cursor-pointer text-xs font-bold">
+                        </div>
+                    </div>
+                    <div class="p-4 border border-gray-100 rounded-2xl bg-gray-50/50 flex justify-between items-center">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Guests</label>
+                            <span id="guest-count-label" class="font-semibold text-xs">2 Adults</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateGuests(-1)" class="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-xs hover:border-primary">-</button>
+                            <span id="guests-val" class="font-bold text-xs px-2">2</span>
+                            <button onclick="updateGuests(1)" class="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center font-bold text-xs hover:border-primary">+</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2.5 mb-6 text-xs text-gray-600">
+                    <div class="flex justify-between">
+                        <span id="calc-guests">$180 x 2 guests</span>
+                        <span id="calc-subtotal" class="font-bold text-secondary">$360</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>JordanAI Member Discount (5%)</span>
+                        <span id="calc-discount" class="font-bold text-green">-$18</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Heritage Reserve Preservation Fee</span>
+                        <span class="font-bold text-secondary">$12</span>
+                    </div>
+                    <div class="pt-3 border-t border-gray-100 flex justify-between items-center text-sm">
+                        <span class="font-bold font-heading text-secondary">Total Due</span>
+                        <span id="calc-total" class="text-2xl font-bold font-heading text-primary">$354</span>
+                    </div>
+                </div>
+
+                <button onclick="handleBooking()" class="w-full bg-primary text-white py-4 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.01] transition-transform mb-3 flex items-center justify-center">
+                    <i class="fas fa-lock mr-2 text-xs"></i> Confirm & Proceed to Ticket
+                </button>
+                <p class="text-center text-[11px] text-gray-400">Instant confirmation • Free cancellation up to 48h prior</p>
+                
+                <div class="mt-6 pt-6 border-t border-gray-100">
+                    <div class="flex items-center mb-3">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-4.jpg" class="w-10 h-10 rounded-full mr-3 border border-gray-200 object-cover">
+                        <div>
+                            <p class="text-xs font-bold">Hosted by Wadi Bedouin Expeditions</p>
+                            <p class="text-[10px] text-gray-400">Verified Local Partner • Licensed Operator</p>
+                        </div>
+                    </div>
+                    <a href="mailto:support@jordanai.travel?subject=Question%20about%20Wadi%20Rum%20Experience" class="block text-center border border-gray-200 text-secondary py-2.5 rounded-xl text-xs font-bold hover:bg-gray-50 transition-colors">
+                        <i class="far fa-envelope mr-1.5"></i> Message Provider
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Booking Confirmation Modal -->
+    <div id="booking-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+            <div class="w-16 h-16 bg-green/10 text-green rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="text-2xl font-bold font-heading mb-2">Booking Confirmed!</h3>
+            <p class="text-xs text-gray-500 mb-6">Your luxury Martian dome reservation has been saved with confirmation code <span class="font-bold text-black">JOR-99210</span>.</p>
+            <div class="space-y-3">
+                <a href="dashboard.html" class="block w-full bg-primary text-white py-3.5 rounded-xl font-bold text-xs hover:bg-red-700 transition-colors">
+                    View in Customer Dashboard
+                </a>
+                <button onclick="document.getElementById('booking-modal').classList.add('hidden')" class="block w-full bg-gray-100 text-gray-600 py-3 rounded-xl font-bold text-xs hover:bg-gray-200 transition-colors">
+                    Stay on Page
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 py-8 border-t border-gray-100 mt-auto">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-400 text-xs">
+            <p>&copy; 2026 JordanAI. Handcrafted experiences in the Hashemite Kingdom.</p>
+        </div>
+    </footer>
+
+    <script>
+        let guestCount = 2;
+        const ratePerPerson = 180;
+        const fee = 12;
+
+        function updateGuests(delta) {
+            guestCount = Math.max(1, Math.min(8, guestCount + delta));
+            document.getElementById('guests-val').innerText = guestCount;
+            document.getElementById('guest-count-label').innerText = `${guestCount} Adult${guestCount > 1 ? 's' : ''}`;
+            
+            const subtotal = guestCount * ratePerPerson;
+            const discount = Math.round(subtotal * 0.05);
+            const total = subtotal - discount + fee;
+
+            document.getElementById('calc-guests').innerText = `$${ratePerPerson} x ${guestCount} guest${guestCount > 1 ? 's' : ''}`;
+            document.getElementById('calc-subtotal').innerText = `$${subtotal}`;
+            document.getElementById('calc-discount').innerText = `-$${discount}`;
+            document.getElementById('calc-total').innerText = `$${total}`;
+        }
+
+        function handleBooking() {
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function toggleFavorite(btn) {
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas', 'text-primary');
+            } else {
+                icon.classList.remove('fas', 'text-primary');
+                icon.classList.add('far');
+            }
+        }
+    </script>
+</body>
+</html>

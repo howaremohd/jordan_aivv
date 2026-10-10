@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - JordanAI</title>
+    <meta name="description" content="Sign in or register for JordanAI smart travel collaboration and tourism partner portal.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#CE1126',
+                        secondary: '#0B0D17',
+                        sand: '#E7D3B5',
+                        sandWarm: '#D8BC97',
+                        sandDark: '#C19F73',
+                        green: '#007A3D',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+        }
+
+        /* Seamless Full Screen Container (No Outer Margins or Gaps) */
+        .auth-fullscreen {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            position: relative;
+            background-color: #FFFFFF;
+            overflow: hidden;
+        }
+
+        /* =================================================== */
+        /* SLIDING SHOWCASE PANEL (Smooth Horizontal Glide)   */
+        /* =================================================== */
+        .showcase-side {
+            width: 50vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 20;
+            overflow: hidden;
+            background-color: #0B0D17;
+            transition: transform 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+            will-change: transform;
+        }
+
+        /* When Sign Up is active, showcase glides to the right half */
+        .auth-fullscreen.signup-active .showcase-side {
+            transform: translateX(100%);
+        }
+
+        /* Background Visual Slides Cross-Fade */
+        .showcase-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .showcase-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .showcase-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transform: scale(1.05);
+            transition: transform 1.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .showcase-slide.active .showcase-img {
+            transform: scale(1);
+        }
+
+        .showcase-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(11, 13, 23, 0.22) 0%, rgba(11, 13, 23, 0.48) 45%, rgba(11, 13, 23, 0.9) 100%);
+            z-index: 2;
+        }
+
+        /* Organic Smooth Wave Dividers */
+        .wave-divider-right {
+            position: absolute;
+            top: 0;
+            right: -1px;
+            height: 100%;
+            width: 120px;
+            z-index: 10;
+            pointer-events: none;
+            fill: #FFFFFF;
+            transition: opacity 0.4s ease;
+            opacity: 1;
+        }
+
+        .wave-divider-left {
+            position: absolute;
+            top: 0;
+            left: -1px;
+            height: 100%;
+            width: 120px;
+            z-index: 10;
+            pointer-events: none;
+            fill: #FFFFFF;
+            transform: scaleX(-1);
+            transition: opacity 0.4s ease;
+            opacity: 0;
+        }
+
+        @media (min-width: 1280px) {
+            .wave-divider-right, .wave-divider-left {
+                width: 145px;
+            }
+        }
+
+        .auth-fullscreen.signup-active .wave-divider-right {
+            opacity: 0;
+        }
+
+        .auth-fullscreen.signup-active .wave-divider-left {
+            opacity: 1;
+        }
+
+        /* =================================================== */
+        /* SLIDING FORM PANEL (Smooth Horizontal Glide)       */
+        /* =================================================== */
+        .form-side {
+            width: 50vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 50vw;
+            z-index: 10;
+            background-color: #FFFFFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            scrollbar-width: none;
+            transition: transform 0.85s cubic-bezier(0.65, 0, 0.35, 1);
+            will-change: transform;
+        }
+
+        .form-side::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* When Sign Up is active, form glides to the left half */
+        .auth-fullscreen.signup-active .form-side {
+            transform: translateX(-100%);
+        }
+
+        /* Stacking Grid for Seamless Cross-Fade of Forms */
+        .forms-wrapper {
+            width: 100%;
+            max-width: 440px;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+            margin: auto;
+            padding: 40px 24px;
+        }
+
+        .form-pane {
+            grid-column: 1;
+            grid-row: 1;
+            width: 100%;
+            transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Sign In State */
+        #signInPane {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        #signUpPane {
+            opacity: 0;
+            transform: translateX(40px);
+            pointer-events: none;
+        }
+
+        /* Sign Up State Active */
+        .auth-fullscreen.signup-active #signInPane {
+            opacity: 0;
+            transform: translateX(-40px);
+            pointer-events: none;
+        }
+
+        .auth-fullscreen.signup-active #signUpPane {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+
+        /* Clean Input Styles */
+        .clean-input {
+            width: 100%;
+            height: 48px;
+            padding: 0 16px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #111827;
+            background-color: #FFFFFF;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .clean-input:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+        }
+
+        .clean-input::placeholder {
+            color: #9CA3AF;
+            font-size: 13.5px;
+        }
+
+        /* Primary Button */
+        .btn-black {
+            background-color: #111827;
+            color: #FFFFFF;
+            width: 100%;
+            height: 48px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(17, 24, 39, 0.15);
+            cursor: pointer;
+        }
+
+        .btn-black:hover {
+            background-color: #000000;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(17, 24, 39, 0.25);
+        }
+
+        .btn-black:active {
+            transform: translateY(0);
+        }
+
+        /* Partner Button */
+        .btn-partner {
+            background-color: #FFFFFF;
+            color: #111827;
+            width: 100%;
+            height: 48px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13.5px;
+            border: 1.5px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-partner:hover {
+            border-color: #CE1126;
+            color: #CE1126;
+            background-color: #FFF5F5;
+            transform: translateY(-1px);
+        }
+
+        .btn-partner:active {
+            transform: translateY(0);
+        }
+
+        /* Role Switcher Tabs */
+        .role-pill {
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #6B7280;
+            background: transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .role-pill.active {
+            background-color: #FFFFFF;
+            color: #111827;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .role-pill.active i {
+            color: #CE1126;
+        }
+
+        /* Mobile Layout */
+        @media (max-width: 1024px) {
+            .auth-fullscreen {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+            .showcase-side {
+                width: 100%;
+                height: 38vh;
+                min-height: 320px;
+                position: relative;
+                transform: none !important;
+            }
+            .wave-divider-right, .wave-divider-left {
+                display: none;
+            }
+            .form-side {
+                width: 100%;
+                height: auto;
+                min-height: 62vh;
+                position: relative;
+                left: 0;
+                transform: none !important;
+                padding: 32px 16px 48px;
+            }
+            .forms-wrapper {
+                padding: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Fullscreen Auth Container -->
+    <div class="auth-fullscreen" id="authFullscreen">
+
+        <!-- ============================================== -->
+        <!-- 1. SLIDING SHOWCASE PANEL (Smooth Glide)       -->
+        <!-- ============================================== -->
+        <div class="showcase-side" id="showcaseSide">
+            
+            <!-- SLIDE 1: Sign In Context (Aqaba Marine & Coast) -->
+            <div class="showcase-slide active" id="slideSignin">
+                <img class="showcase-img" src="images/categories/water.jpg" alt="Aqaba Marine Tourism" onerror="this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&auto=format&fit=crop&q=80'" />
+                <div class="showcase-overlay"></div>
+
+                <!-- Top Left Logo Badge -->
+                <div class="relative z-20 p-6 md:p-8">
+                    <a href="index.html" class="inline-flex items-center justify-center w-11 h-11 bg-white rounded-xl shadow-md border border-white/60 hover:scale-105 transition-transform group" title="Return to JordanAI Home">
+                        <span class="font-heading font-black text-xs text-secondary tracking-tighter flex items-center">
+                            <span class="text-primary font-bold">J</span>AI
+                            <i class="fas fa-arrow-right text-[9px] text-gray-500 ml-1 group-hover:translate-x-0.5 transition-transform"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Headline matching reference screenshot -->
+                <div class="relative z-20 p-8 md:p-12 lg:p-14 pb-14 md:pb-20 max-w-xl">
+                    <h1 class="font-heading font-extrabold text-3xl sm:text-4xl lg:text-[44px] leading-[1.12] text-white tracking-tight drop-shadow-md">
+                        Smart Travel<br>
+                        Collaboration<br>
+                        optimize<br>
+                        journeys for<br>
+                        social impact
+                    </h1>
+                    <p class="text-white/80 text-xs sm:text-sm mt-4 font-light max-w-md leading-relaxed">
+                        AI-powered travel matching that directly empowers local Bedouin hosts, eco-guides, and tourism communities across Jordan.
+                    </p>
+                    <div class="flex items-center space-x-3 mt-6 text-white/70 text-xs font-semibold">
+                        <span class="flex items-center"><i class="fas fa-shield-check text-green mr-1.5 text-sm"></i> Official Tourism AI</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                        <span>Kingdom of Jordan</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLIDE 2: Sign Up Context (Wadi Rum & Desert Wonder) -->
+            <div class="showcase-slide" id="slideSignup">
+                <img class="showcase-img" src="images/categories/adventure.jpg" alt="Wadi Rum Golden Sands" onerror="this.src='https://images.unsplash.com/photo-1544717305-2782549b5136?w=1600&auto=format&fit=crop&q=80'" />
+                <div class="showcase-overlay"></div>
+
+                <!-- Top Left Logo Badge -->
+                <div class="relative z-20 p-6 md:p-8">
+                    <a href="index.html" class="inline-flex items-center justify-center w-11 h-11 bg-white rounded-xl shadow-md border border-white/60 hover:scale-105 transition-transform group" title="Return to JordanAI Home">
+                        <span class="font-heading font-black text-xs text-secondary tracking-tighter flex items-center">
+                            <span class="text-primary font-bold">J</span>AI
+                            <i class="fas fa-arrow-right text-[9px] text-gray-500 ml-1 group-hover:translate-x-0.5 transition-transform"></i>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Headline for Sign Up state -->
+                <div class="relative z-20 p-8 md:p-12 lg:p-14 pb-14 md:pb-20 max-w-xl">
+                    <h1 class="font-heading font-extrabold text-3xl sm:text-4xl lg:text-[44px] leading-[1.12] text-white tracking-tight drop-shadow-md">
+                        Discover Jordan’s<br>
+                        Living Heritage<br>
+                        join the journey<br>
+                        of a lifetime
+                    </h1>
+                    <p class="text-white/80 text-xs sm:text-sm mt-4 font-light max-w-md leading-relaxed">
+                        Create your free travel passport to access AI customized trail maps, direct partner discounts, and verified Bedouin experiences.
+                    </p>
+                    <div class="flex items-center space-x-3 mt-6 text-white/70 text-xs font-semibold">
+                        <span class="flex items-center"><i class="fas fa-sparkles text-sand mr-1.5 text-sm"></i> Free Explorer Passport</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                        <span>Verified Guides</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Organic Curved Wave Divider Right (When Showcase is on Left) -->
+            <svg class="wave-divider-right" viewBox="0 0 100 1000" preserveAspectRatio="none">
+                <path d="M100,0 L0,0 C20,180 55,340 92,540 C60,740 25,860 0,1000 L100,1000 Z" />
+            </svg>
+
+            <!-- Organic Curved Wave Divider Left (When Showcase is on Right) -->
+            <svg class="wave-divider-left" viewBox="0 0 100 1000" preserveAspectRatio="none">
+                <path d="M100,0 L0,0 C20,180 55,340 92,540 C60,740 25,860 0,1000 L100,1000 Z" />
+            </svg>
+
+        </div>
+
+        <!-- ============================================== -->
+        <!-- 2. SLIDING FORM PANEL (Smooth Glide)           -->
+        <!-- ============================================== -->
+        <div class="form-side" id="formSide">
+
+            <!-- Top Right Navigation Icon -->
+            <div class="absolute top-6 right-6 md:top-8 md:right-8 z-30 flex items-center space-x-3">
+                <a href="index.html" class="text-xs font-semibold text-gray-500 hover:text-black transition-colors hidden sm:inline-block">Home</a>
+                <a href="partner-dashboard.html" class="text-xs font-semibold text-gray-500 hover:text-primary transition-colors hidden sm:inline-block">Partner Hub</a>
+                <button type="button" onclick="toggleNavDropdown()" class="w-10 h-10 flex items-center justify-center text-gray-800 hover:text-black rounded-xl hover:bg-gray-100 transition-colors" title="Menu">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Floating Menu Dropdown -->
+            <div id="navDropdown" class="hidden absolute top-20 right-6 md:right-8 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 py-2 z-40">
+                <a href="index.html" class="flex items-center px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-home w-5 text-gray-400"></i> Public Homepage
+                </a>
+                <a href="discovery.html" class="flex items-center px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-compass w-5 text-gray-400"></i> Discover Jordan
+                </a>
+                <a href="dashboard.html" class="flex items-center px-4 py-2.5 text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                    <i class="fas fa-user-circle w-5 text-gray-400"></i> Traveler Dashboard
+                </a>
+                <a href="partner-dashboard.html" class="flex items-center px-4 py-2.5 text-xs font-semibold text-primary hover:bg-red-50">
+                    <i class="fas fa-handshake w-5 text-primary"></i> Partner Dashboard
+                </a>
+            </div>
+
+            <!-- Forms Wrapper (Grid stacked for seamless cross-fade animation) -->
+            <div class="forms-wrapper">
+
+                <!-- ------------------------------------------ -->
+                <!-- PANE 1: SIGN IN VIEW                       -->
+                <!-- ------------------------------------------ -->
+                <div class="form-pane" id="signInPane">
+                    
+                    <!-- Main Header -->
+                    <div class="mb-6">
+                        <h2 class="font-heading font-extrabold text-3xl md:text-[38px] text-gray-900 leading-tight tracking-tight" id="signin-main-title">
+                            Welcome<br>Back
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1.5" id="signin-sub-title">Enter your credentials to access your dashboard.</p>
+                    </div>
+
+                    <!-- Account Type Selector (Traveler vs Partner) -->
+                    <div class="mb-5">
+                        <div class="grid grid-cols-2 p-1 bg-gray-100 rounded-xl gap-1">
+                            <button type="button" onclick="selectSignInRole('user')" id="signin-tab-user" class="role-pill active">
+                                <i class="fas fa-compass"></i>
+                                <span>Traveler / مستخدم</span>
+                            </button>
+                            <button type="button" onclick="selectSignInRole('partner')" id="signin-tab-partner" class="role-pill">
+                                <i class="fas fa-handshake"></i>
+                                <span>Partner / شريك</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sign In Form -->
+                    <form id="signin-form" onsubmit="handleSignInSubmit(event)" class="space-y-4">
+                        
+                        <!-- Email Field -->
+                        <div>
+                            <label for="signin-email" class="block text-xs font-bold text-gray-700 mb-1.5">Email</label>
+                            <input type="email" id="signin-email" placeholder="Enter your email" value="sarah.a@example.com" class="clean-input" required>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div>
+                            <label for="signin-password" class="block text-xs font-bold text-gray-700 mb-1.5">Password</label>
+                            <div class="relative">
+                                <input type="password" id="signin-password" placeholder="Enter your password" value="JordanTravel2026" class="clean-input pr-11" required>
+                                <button type="button" onclick="togglePasswordVisibility('signin-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-sm">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Remember Me & Forgot Password -->
+                        <div class="flex items-center justify-between text-xs pt-1">
+                            <label class="flex items-center gap-2 cursor-pointer select-none text-gray-600 font-medium">
+                                <input type="checkbox" checked class="w-4 h-4 rounded border-gray-300 text-black accent-black">
+                                <span>Remember me</span>
+                            </label>
+                            <a href="javascript:void(0)" onclick="handleForgotPassword()" class="font-bold text-gray-900 hover:underline">Forgot Password</a>
+                        </div>
+
+                        <!-- Dual Direct Buttons (User vs Partner) -->
+                        <div class="space-y-2.5 pt-2">
+                            <!-- Primary Button 1: Sign in as User -->
+                            <button type="button" onclick="handleAuthSubmitWithRole('user')" id="btn-login-user" class="btn-black">
+                                <span>Sign in</span>
+                                <span class="text-xs font-normal opacity-70 ml-2">(as User / مستخدم)</span>
+                            </button>
+
+                            <!-- Primary Button 2: Sign in as Partner -->
+                            <button type="button" onclick="handleAuthSubmitWithRole('partner')" id="btn-login-partner" class="btn-partner">
+                                <i class="fas fa-handshake mr-2 text-primary"></i>
+                                <span>Sign in as Partner / دخول كشريك</span>
+                            </button>
+                        </div>
+
+                        <!-- OR Divider -->
+                        <div class="relative my-4 text-center">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+                            <span class="relative bg-white px-3 text-[11px] font-bold tracking-widest text-gray-400 uppercase">OR</span>
+                        </div>
+
+                        <!-- Google SSO -->
+                        <button type="button" onclick="simulateGoogleAuth('Sign In')" class="w-full h-11 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2.5 transition-all shadow-sm">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4" alt="Google">
+                            <span>Sign in with Google</span>
+                        </button>
+
+                        <!-- Toggle to Sign Up with Animation -->
+                        <p class="text-center text-xs text-gray-500 pt-3">
+                            Don't have an account? 
+                            <button type="button" onclick="switchToSignup()" class="font-bold text-primary hover:underline ml-1">
+                                Sign up
+                            </button>
+                        </p>
+
+                    </form>
+
+                </div>
+
+
+                <!-- ------------------------------------------ -->
+                <!-- PANE 2: SIGN UP VIEW                       -->
+                <!-- ------------------------------------------ -->
+                <div class="form-pane" id="signUpPane">
+                    
+                    <!-- Main Header -->
+                    <div class="mb-5">
+                        <h2 class="font-heading font-extrabold text-3xl md:text-[38px] text-gray-900 leading-tight tracking-tight" id="signup-main-title">
+                            Create<br>Account
+                        </h2>
+                        <p class="text-xs text-gray-400 mt-1.5" id="signup-sub-title">Start your AI-guided journey across the Hashemite Kingdom.</p>
+                    </div>
+
+                    <!-- Account Type Selector (Traveler vs Partner) -->
+                    <div class="mb-4">
+                        <div class="grid grid-cols-2 p-1 bg-gray-100 rounded-xl gap-1">
+                            <button type="button" onclick="selectSignUpRole('user')" id="signup-tab-user" class="role-pill active">
+                                <i class="fas fa-compass"></i>
+                                <span>Traveler / مسافر</span>
+                            </button>
+                            <button type="button" onclick="selectSignUpRole('partner')" id="signup-tab-partner" class="role-pill">
+                                <i class="fas fa-handshake"></i>
+                                <span>Partner / مزود خدمة</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sign Up Form -->
+                    <form id="signup-form" onsubmit="handleSignUpSubmit(event)" class="space-y-3.5">
+                        
+                        <!-- Full Name -->
+                        <div>
+                            <label for="signup-name" id="signup-name-label" class="block text-xs font-bold text-gray-700 mb-1">Full Name</label>
+                            <input type="text" id="signup-name" placeholder="Enter your full name" value="Tariq Mansour" class="clean-input" required>
+                        </div>
+
+                        <!-- Email Field -->
+                        <div>
+                            <label for="signup-email" id="signup-email-label" class="block text-xs font-bold text-gray-700 mb-1">Email</label>
+                            <input type="email" id="signup-email" placeholder="Enter your email" value="tariq@traveler.com" class="clean-input" required>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div>
+                            <label for="signup-password" class="block text-xs font-bold text-gray-700 mb-1">Password</label>
+                            <div class="relative">
+                                <input type="password" id="signup-password" onkeyup="checkPasswordStrength(this.value)" placeholder="Enter at least 8 characters" class="clean-input pr-11" required minlength="8">
+                                <button type="button" onclick="togglePasswordVisibility('signup-password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 text-sm">
+                                    <i class="far fa-eye"></i>
+                                </button>
+                            </div>
+                            <!-- Password Strength Bar -->
+                            <div class="flex items-center space-x-2 mt-1.5">
+                                <div class="h-1 flex-1 bg-gray-100 rounded-full overflow-hidden">
+                                    <div id="strength-bar" class="h-full w-0 bg-primary transition-all duration-300"></div>
+                                </div>
+                                <span id="strength-text" class="text-[10px] text-gray-400 font-semibold">Min 8 chars</span>
+                            </div>
+                        </div>
+
+                        <!-- Terms Checkbox -->
+                        <div class="pt-0.5">
+                            <label class="flex items-start gap-2 cursor-pointer select-none text-xs text-gray-600">
+                                <input type="checkbox" required class="w-4 h-4 mt-0.5 rounded border-gray-300 text-black accent-black">
+                                <span>I agree to JordanAI <a href="#" class="text-black font-semibold hover:underline">Terms of Service</a> & <a href="#" class="text-black font-semibold hover:underline">Privacy Policy</a></span>
+                            </label>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button type="submit" id="signup-submit-btn" class="btn-black mt-2">
+                            <span id="signup-btn-text">Create Account</span>
+                        </button>
+
+                        <!-- OR Divider -->
+                        <div class="relative my-3 text-center">
+                            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+                            <span class="relative bg-white px-3 text-[11px] font-bold tracking-widest text-gray-400 uppercase">OR</span>
+                        </div>
+
+                        <!-- Google SSO -->
+                        <button type="button" onclick="simulateGoogleAuth('Sign Up')" class="w-full h-11 border border-gray-200 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2.5 transition-all shadow-sm">
+                            <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4" alt="Google">
+                            <span>Sign up with Google</span>
+                        </button>
+
+                        <!-- Toggle to Sign In with Animation -->
+                        <p class="text-center text-xs text-gray-500 pt-2">
+                            Already have an account? 
+                            <button type="button" onclick="switchToSignin()" class="font-bold text-primary hover:underline ml-1">
+                                Sign in here
+                            </button>
+                        </p>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="auth-toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Interactive Script with Smooth Animation Transitions -->
+    <script>
+        const authFullscreen = document.getElementById('authFullscreen');
+        const slideSignin = document.getElementById('slideSignin');
+        const slideSignup = document.getElementById('slideSignup');
+        const navDropdown = document.getElementById('navDropdown');
+
+        let currentSignInRole = 'user'; // 'user' | 'partner'
+        let currentSignUpRole = 'user'; // 'user' | 'partner'
+
+        // Check URL Hash on Load (#signup or #login)
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.toLowerCase();
+            if (hash === '#signup' || hash === '#register') {
+                switchToSignup(false);
+            } else {
+                switchToSignin(false);
+            }
+        });
+
+        // Toggle Top Right Menu Dropdown
+        function toggleNavDropdown() {
+            navDropdown.classList.toggle('hidden');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#navDropdown') && !e.target.closest('button[onclick="toggleNavDropdown()"]')) {
+                navDropdown.classList.add('hidden');
+            }
+        });
+
+        // ============================================================
+        // SMOOTH ANIMATION TRANSITIONS: Switch to Sign Up
+        // ============================================================
+        function switchToSignup(updateUrl = true) {
+            // Trigger 50vw panel slide and form cross-fade
+            authFullscreen.classList.add('signup-active');
+
+            // Cross-fade visual showcase background and text
+            slideSignin.classList.remove('active');
+            slideSignup.classList.add('active');
+
+            if (updateUrl) {
+                history.replaceState(null, null, '#signup');
+            }
+        }
+
+        // ============================================================
+        // SMOOTH ANIMATION TRANSITIONS: Switch to Sign In
+        // ============================================================
+        function switchToSignin(updateUrl = true) {
+            // Reverse 50vw panel slide and form cross-fade
+            authFullscreen.classList.remove('signup-active');
+
+            // Cross-fade visual showcase background and text
+            slideSignup.classList.remove('active');
+            slideSignin.classList.add('active');
+
+            if (updateUrl) {
+                history.replaceState(null, null, '#login');
+            }
+        }
+
+        // Select Sign In Role (Traveler User vs Tourism Partner)
+        function selectSignInRole(role) {
+            currentSignInRole = role;
+            const userTab = document.getElementById('signin-tab-user');
+            const partnerTab = document.getElementById('signin-tab-partner');
+            const subTitle = document.getElementById('signin-sub-title');
+            const emailInput = document.getElementById('signin-email');
+
+            if (role === 'partner') {
+                userTab.classList.remove('active');
+                partnerTab.classList.add('active');
+                subTitle.textContent = 'Partner Portal: Access operator bookings, revenue analytics, and tour listings.';
+                if (!emailInput.value || emailInput.value === 'sarah.a@example.com') {
+                    emailInput.value = 'partner@wadiadventures.jo';
+                }
+                showToast('Switched to Tourism Partner Portal 🤝', 'info');
+            } else {
+                partnerTab.classList.remove('active');
+                userTab.classList.add('active');
+                subTitle.textContent = 'Traveler Portal: Enter your credentials to access your trips and passport.';
+                if (!emailInput.value || emailInput.value === 'partner@wadiadventures.jo') {
+                    emailInput.value = 'sarah.a@example.com';
+                }
+                showToast('Switched to Traveler User Portal 🧭', 'info');
+            }
+        }
+
+        // Direct Sign In Execution (User vs Partner)
+        function handleAuthSubmitWithRole(role) {
+            const form = document.getElementById('signin-form');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            const email = document.getElementById('signin-email').value;
+            const btnUser = document.getElementById('btn-login-user');
+            const btnPartner = document.getElementById('btn-login-partner');
+            const targetBtn = role === 'partner' ? btnPartner : btnUser;
+            
+            targetBtn.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i> Verifying...`;
+            btnUser.disabled = true;
+            btnPartner.disabled = true;
+
+            if (role === 'partner') {
+                showToast('Authenticating with JordanAI Partner Portal...', 'info');
+                setTimeout(() => {
+                    showToast('Welcome Wadi Adventures! Opening Partner Dashboard...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'partner-dashboard.html';
+                    }, 500);
+                }, 800);
+            } else {
+                showToast('Authenticating Traveler Profile...', 'info');
+                setTimeout(() => {
+                    showToast(`Welcome back, ${email.split('@')[0]}! Entering Home Page...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                }, 800);
+            }
+        }
+
+        // Form Submit on Enter Key
+        function handleSignInSubmit(e) {
+            e.preventDefault();
+            handleAuthSubmitWithRole(currentSignInRole);
+        }
+
+        // Select Sign Up Role
+        function selectSignUpRole(role) {
+            currentSignUpRole = role;
+            const userTab = document.getElementById('signup-tab-user');
+            const partnerTab = document.getElementById('signup-tab-partner');
+            const submitBtnText = document.getElementById('signup-btn-text');
+            const nameLabel = document.getElementById('signup-name-label');
+            const nameInput = document.getElementById('signup-name');
+            const subTitle = document.getElementById('signup-sub-title');
+
+            if (role === 'partner') {
+                userTab.classList.remove('active');
+                partnerTab.classList.add('active');
+                subTitle.textContent = 'Partner Registration: Join as a verified tour operator, hotel, or guide.';
+                submitBtnText.textContent = 'Register as Tourism Partner';
+                nameLabel.textContent = 'Company / Host Name';
+                nameInput.placeholder = 'Wadi Adventures Eco Tours';
+                showToast('Selected Partner Registration 🤝', 'info');
+            } else {
+                partnerTab.classList.remove('active');
+                userTab.classList.add('active');
+                subTitle.textContent = 'Traveler Registration: Start your AI-guided journey across Jordan.';
+                submitBtnText.textContent = 'Create Account';
+                nameLabel.textContent = 'Full Name';
+                nameInput.placeholder = 'Enter your full name';
+                showToast('Selected Traveler Registration 🧭', 'info');
+            }
+        }
+
+        // Handle Sign Up Submit
+        function handleSignUpSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('signup-submit-btn');
+            const name = document.getElementById('signup-name').value;
+
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i> Registering...`;
+            btn.disabled = true;
+
+            if (currentSignUpRole === 'partner') {
+                showToast('Registering partner account and setting up workspace...', 'info');
+                setTimeout(() => {
+                    showToast(`Marhaba ${name}! Partner account ready. Loading portal...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'partner-dashboard.html';
+                    }, 500);
+                }, 850);
+            } else {
+                showToast('Creating your personalized Jordan passport...', 'info');
+                setTimeout(() => {
+                    showToast(`Marhaba ${name}! Entering JordanAI Home...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                }, 850);
+            }
+        }
+
+        // Toggle Password Show/Hide
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        // Realtime Password Strength Meter
+        function checkPasswordStrength(val) {
+            const bar = document.getElementById('strength-bar');
+            const text = document.getElementById('strength-text');
+            if (!val) {
+                bar.style.width = '0%';
+                text.textContent = 'Min 8 chars';
+                return;
+            }
+            let score = 0;
+            if (val.length >= 8) score += 35;
+            if (/[A-Z]/.test(val)) score += 25;
+            if (/[0-9]/.test(val)) score += 20;
+            if (/[^A-Za-z0-9]/.test(val)) score += 20;
+
+            bar.style.width = score + '%';
+
+            if (score < 40) {
+                bar.className = 'h-full bg-red-500 transition-all duration-300';
+                text.textContent = 'Weak';
+                text.className = 'text-[10px] text-red-500 font-semibold';
+            } else if (score < 75) {
+                bar.className = 'h-full bg-yellow-500 transition-all duration-300';
+                text.textContent = 'Good';
+                text.className = 'text-[10px] text-yellow-500 font-semibold';
+            } else {
+                bar.className = 'h-full bg-green transition-all duration-300';
+                text.textContent = 'Strong';
+                text.className = 'text-[10px] text-green font-semibold';
+            }
+        }
+
+        // Simulate Google SSO
+        function simulateGoogleAuth(action) {
+            const isSignUp = authFullscreen.classList.contains('signup-active');
+            const role = isSignUp ? currentSignUpRole : currentSignInRole;
+            showToast(`Connecting to Google for ${action}...`);
+            setTimeout(() => {
+                showToast('Google account verified! Entering portal...', 'success');
+                setTimeout(() => {
+                    window.location.href = role === 'partner' ? 'partner-dashboard.html' : 'index.html';
+                }, 500);
+            }, 800);
+        }
+
+        function handleForgotPassword() {
+            const email = document.getElementById('signin-email').value;
+            if (!email) {
+                showToast('Please type your email first.');
+                return;
+            }
+            showToast(`Password reset link sent to ${email}`, 'success');
+        }
+
+        // Toast Helper
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('auth-toast-container');
+            const toast = document.createElement('div');
+            const icon = type === 'success' ? 'fa-check-circle text-green' : 'fa-info-circle text-sand';
+            
+            toast.className = 'bg-secondary text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center space-x-3 text-xs font-semibold pointer-events-auto border border-white/10 transform translate-y-3 opacity-0 transition-all duration-300';
+            toast.innerHTML = `
+                <i class="fas ${icon} text-sm"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-3', 'opacity-0');
+            }, 15);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 350);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

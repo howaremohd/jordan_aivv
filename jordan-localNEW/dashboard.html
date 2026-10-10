@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script>
+        window.FontAwesomeConfig = {
+          autoReplaceSvg: 'nest'
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard - JordanAI</title>
+    <meta name="description" content="Manage your Jordanian itineraries, digital tickets, rewards points, and personal travel profile.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#CE1126',
+                        secondary: '#000000',
+                        white: '#FFFFFF',
+                        sand: '#E7D3B5',
+                        green: '#007A3D',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-heading { font-family: 'Montserrat', sans-serif; }
+        .sidebar-link.active {
+            background-color: #CE1126;
+            color: white;
+            box-shadow: 0 10px 20px -5px rgba(206, 17, 38, 0.3);
+        }
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-secondary min-h-screen">
+
+    <!-- Mobile Nav Header -->
+    <header class="lg:hidden bg-white border-b border-gray-100 p-4 flex justify-between items-center sticky top-0 z-50">
+        <a href="index.html" class="text-xl font-bold font-heading tracking-tight">Jordan<span class="text-primary">AI</span></a>
+        <button id="mobile-menu-btn" class="p-2 text-gray-500">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </header>
+
+    <div class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-gray-100 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 lg:static lg:block overflow-y-auto">
+            <div class="p-8 hidden lg:block">
+                <a href="index.html" class="text-2xl font-bold font-heading tracking-tight">Jordan<span class="text-primary">AI</span></a>
+            </div>
+
+            <div class="px-8 mb-6 mt-4 lg:mt-0">
+                <div class="flex items-center space-x-4 mb-4">
+                    <div class="relative group">
+                        <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/avatars/avatar-2.jpg" class="w-14 h-14 rounded-full object-cover ring-2 ring-sand ring-offset-2">
+                        <div class="absolute -bottom-1 -right-1 bg-primary text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] shadow-sm">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="font-bold text-sm truncate">Sarah Anderson</p>
+                        <p class="text-xs text-gray-400 truncate">sarah.a@example.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="px-4 space-y-1">
+                <button onclick="switchTab('overview', this)" class="sidebar-link active w-full flex items-center p-3.5 rounded-2xl transition-all">
+                    <i class="fas fa-th-large w-6"></i> <span class="text-sm font-bold">Overview</span>
+                </button>
+                <button onclick="switchTab('profile', this)" class="sidebar-link w-full flex items-center p-3.5 rounded-2xl text-gray-500 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-user-circle w-6"></i> <span class="text-sm font-bold">My Profile</span>
+                </button>
+                <button onclick="switchTab('favorites', this)" class="sidebar-link w-full flex items-center p-3.5 rounded-2xl text-gray-500 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-heart w-6"></i> <span class="text-sm font-bold">My Favorites</span>
+                </button>
+                <button onclick="switchTab('trips', this)" class="sidebar-link w-full flex items-center p-3.5 rounded-2xl text-gray-500 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-suitcase w-6"></i> <span class="text-sm font-bold">Previous Trips</span>
+                </button>
+                <button onclick="switchTab('settings', this)" class="sidebar-link w-full flex items-center p-3.5 rounded-2xl text-gray-500 hover:bg-gray-50 transition-all">
+                    <i class="fas fa-cog w-6"></i> <span class="text-sm font-bold">Account Settings</span>
+                </button>
+                <div class="pt-6 mt-6 border-t border-gray-100">
+                    <a href="partner-dashboard.html" class="w-full flex items-center p-3.5 rounded-2xl text-secondary hover:text-primary transition-all font-bold bg-primary/5 hover:bg-primary/10 mb-1">
+                        <i class="fas fa-briefcase w-6 text-primary"></i> <span class="text-sm">Partner Portal</span>
+                    </a>
+                    <a href="index.html" class="w-full flex items-center p-3.5 rounded-2xl text-gray-500 hover:text-primary transition-all">
+                        <i class="fas fa-arrow-left w-6"></i> <span class="text-sm font-bold">Back to Main Site</span>
+                    </a>
+                    <a href="login.html" class="w-full flex items-center p-3.5 rounded-2xl text-gray-400 hover:text-primary transition-all">
+                        <i class="fas fa-sign-out-alt w-6"></i> <span class="text-sm font-bold">Log Out</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 min-w-0 bg-gray-50/50">
+
+            <!-- Section: Overview -->
+            <section id="overview-section" class="content-section active p-6 lg:p-12 animate-in fade-in duration-500">
+                <div class="mb-10">
+                    <h1 class="text-3xl font-bold font-heading">Welcome back, Sarah!</h1>
+                    <p class="text-gray-500 text-sm">Here is a real-time summary of your Jordanian adventures and active itinerary.</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white p-7 rounded-[2rem] shadow-sm border border-gray-100 flex items-center space-x-6 group hover:shadow-lg transition-all">
+                        <div class="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="fas fa-suitcase"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Total Trips</p>
+                            <p class="text-2xl font-bold font-heading">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-7 rounded-[2rem] shadow-sm border border-gray-100 flex items-center space-x-6 group hover:shadow-lg transition-all">
+                        <div class="w-14 h-14 bg-sand/30 text-secondary rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="fas fa-coins text-amber-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reward Points</p>
+                            <p class="text-2xl font-bold font-heading">0</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-7 rounded-[2rem] shadow-sm border border-gray-100 flex items-center space-x-6 group hover:shadow-lg transition-all">
+                        <div class="w-14 h-14 bg-green/10 text-green rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Upcoming Dates</p>
+                            <p class="text-2xl font-bold font-heading">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upcoming Widget -->
+                <div class="mb-12">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold font-heading">Next Destination</h2>
+                        <button onclick="switchTab('trips', document.querySelectorAll('.sidebar-link')[3])" class="text-xs font-bold text-primary hover:underline">View All Trips</button>
+                    </div>
+                    <div class="bg-secondary text-white rounded-[2.5rem] p-8 relative overflow-hidden group shadow-xl">
+                        <div class="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[80px] rounded-full -mr-20 -mt-20 group-hover:bg-primary/30 transition-all duration-700"></div>
+                        <div class="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                            <div class="w-full md:w-40 h-40 rounded-3xl overflow-hidden shrink-0">
+                                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_3d99453d23_1e586bde2d89f6c1.png" alt="Dead Sea" />
+                            </div>
+                            <div class="flex-1 space-y-4 text-center md:text-left">
+                                <div>
+                                    <p class="text-[10px] font-bold text-primary uppercase tracking-[0.2em] mb-1">Coming up in 3 days</p>
+                                    <h3 class="text-2xl font-bold font-heading">Dead Sea Floating & Spa</h3>
+                                    <p class="text-sm text-gray-400">June 18, 2026 • 10:00 AM</p>
+                                </div>
+                                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                                    <div class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+                                        <p class="text-[9px] text-gray-500 uppercase font-bold">Ref No.</p>
+                                        <p class="text-xs font-bold uppercase">JOR-99210</p>
+                                    </div>
+                                    <div class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl">
+                                        <p class="text-[9px] text-gray-500 uppercase font-bold">Status</p>
+                                        <p class="text-xs font-bold text-green-400">Confirmed</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="shrink-0">
+                                <button onclick="showTicketModal()" class="bg-primary text-white w-20 h-20 rounded-3xl flex flex-col items-center justify-center shadow-lg hover:scale-105 transition-transform group">
+                                    <i class="fas fa-qrcode text-2xl mb-1"></i>
+                                    <span class="text-[9px] font-bold uppercase">Ticket</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Favorites Preview -->
+                <div>
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold font-heading">Recent Favorites</h2>
+                        <button onclick="switchTab('favorites', document.querySelectorAll('.sidebar-link')[2])" class="text-xs font-bold text-primary hover:underline">See All</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <a href="discovery.html?dest=petra" class="bg-white p-4 rounded-[2rem] border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-all">
+                            <div class="w-20 h-20 rounded-2xl overflow-hidden shrink-0">
+                                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_561fea4429_cdc6ac7df5e69d1d.png" alt="Petra Guided Tour" />
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Petra Guided Tour</h4>
+                                <p class="text-[10px] text-gray-400">Wadi Musa, Jordan</p>
+                                <span class="text-xs font-bold text-primary mt-1 inline-block">$45 / person</span>
+                            </div>
+                        </a>
+                        <a href="experience-detail.html" class="bg-white p-4 rounded-[2rem] border border-gray-100 flex items-center space-x-4 hover:shadow-md transition-all">
+                            <div class="w-20 h-20 rounded-2xl overflow-hidden shrink-0">
+                                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_5580851059_55ca3ae230521864.png" alt="Wadi Rum Dome Camp" />
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">Wadi Rum Martian Dome</h4>
+                                <p class="text-[10px] text-gray-400">Wadi Rum Desert</p>
+                                <span class="text-xs font-bold text-primary mt-1 inline-block">$180 / night</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Profile -->
+            <section id="profile-section" class="content-section p-6 lg:p-12 animate-in fade-in duration-500">
+                <div class="max-w-3xl">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 class="text-3xl font-bold font-heading">My Profile</h1>
+                            <p class="text-gray-500 text-xs mt-1">Manage your traveler credentials and contact preferences.</p>
+                        </div>
+                        <button onclick="toggleEdit('profile-form')" id="edit-btn" class="bg-white border border-gray-200 text-secondary px-6 py-2.5 rounded-xl font-bold text-xs shadow-sm hover:bg-gray-50 transition-all">
+                            <i class="fas fa-edit mr-2 text-primary"></i> Edit Profile
+                        </button>
+                    </div>
+
+                    <div id="profile-form" class="bg-white rounded-[2.5rem] p-8 lg:p-10 shadow-sm border border-gray-100">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                                <input type="text" value="Sarah Anderson" readonly class="w-full bg-gray-50 border-none rounded-2xl py-3.5 px-5 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                                <input type="email" value="sarah.a@example.com" readonly class="w-full bg-gray-50 border-none rounded-2xl py-3.5 px-5 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                                <input type="text" value="+1 234 567 8900" readonly class="w-full bg-gray-50 border-none rounded-2xl py-3.5 px-5 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Home Location</label>
+                                <input type="text" value="London, UK" readonly class="w-full bg-gray-50 border-none rounded-2xl py-3.5 px-5 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                            </div>
+                            <div class="md:col-span-2 space-y-2">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Personal Travel Bio</label>
+                                <textarea readonly class="w-full bg-gray-50 border-none rounded-2xl py-3.5 px-5 text-sm focus:ring-2 focus:ring-primary/20 transition-all outline-none h-28 resize-none">Adventurer and history lover exploring the wonders of Jordan. Always looking for the perfect sunset spot and local hidden gems in the Levant.</textarea>
+                            </div>
+                        </div>
+
+                        <div id="save-actions" class="hidden mt-8 pt-8 border-t border-gray-100 flex space-x-4">
+                            <button onclick="saveChanges()" class="flex-1 bg-primary text-white py-3.5 rounded-2xl font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.01] transition-transform">Save Changes</button>
+                            <button onclick="toggleEdit('profile-form')" class="px-6 bg-gray-100 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Favorites -->
+            <section id="favorites-section" class="content-section p-6 lg:p-12 animate-in fade-in duration-500">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold font-heading">My Saved Favorites</h1>
+                        <p class="text-gray-500 text-xs mt-1">Bookmarked experiences across Jordan.</p>
+                    </div>
+                    <div class="text-xs font-bold text-primary bg-primary/10 px-4 py-2 rounded-full">3 Saved Activities</div>
+                </div>
+
+                <div id="favorites-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    <!-- Favorite 1 -->
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-44 rounded-2xl overflow-hidden mb-3">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_5580851059_55ca3ae230521864.png" class="w-full h-full object-cover">
+                                <span class="absolute top-3 right-3 bg-primary text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Wadi Rum</span>
+                            </div>
+                            <h3 class="font-bold text-base mb-1">Luxury Star-Gazing Dome</h3>
+                            <p class="text-xs text-gray-400 mb-3">Bedouin Camp, 2 Days</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-50">
+                            <span class="font-bold text-primary text-sm">$180/night</span>
+                            <a href="experience-detail.html" class="bg-secondary text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary transition-colors">Book</a>
+                        </div>
+                    </div>
+
+                    <!-- Favorite 2 -->
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-44 rounded-2xl overflow-hidden mb-3">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_561fea4429_cdc6ac7df5e69d1d.png" class="w-full h-full object-cover">
+                                <span class="absolute top-3 right-3 bg-secondary text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Petra</span>
+                            </div>
+                            <h3 class="font-bold text-base mb-1">Petra Guided Siq Trail</h3>
+                            <p class="text-xs text-gray-400 mb-3">Ancient Nabataean Ruins</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-50">
+                            <span class="font-bold text-primary text-sm">$45/person</span>
+                            <a href="discovery.html" class="bg-secondary text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary transition-colors">Book</a>
+                        </div>
+                    </div>
+
+                    <!-- Favorite 3 -->
+                    <div class="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm p-4 flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-44 rounded-2xl overflow-hidden mb-3">
+                                <img src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_30c87605fb_416d389158e9ee6c.png" class="w-full h-full object-cover">
+                                <span class="absolute top-3 right-3 bg-green-700 text-white text-[10px] font-bold px-2.5 py-1 rounded-full">Dead Sea</span>
+                            </div>
+                            <h3 class="font-bold text-base mb-1">Dead Sea Spa Day</h3>
+                            <p class="text-xs text-gray-400 mb-3">Mineral Mud Therapy</p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-gray-50">
+                            <span class="font-bold text-primary text-sm">$30/person</span>
+                            <a href="discovery.html" class="bg-secondary text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-primary transition-colors">Book</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Trips -->
+            <section id="trips-section" class="content-section p-6 lg:p-12 animate-in fade-in duration-500">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 class="text-3xl font-bold font-heading">Previous & Active Trips</h1>
+                        <p class="text-gray-500 text-xs mt-1">Review your completed itineraries and verify booking vouchers.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Trip 1: Active -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0">
+                                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_3d99453d23_1e586bde2d89f6c1.png" alt="Dead Sea" />
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-green-600 bg-green-50 px-2 py-0.5 rounded-md">Upcoming • June 18, 2026</span>
+                                <h3 class="font-bold text-base mt-1">Dead Sea Floating & Spa Experience</h3>
+                                <p class="text-xs text-gray-400">Ref: JOR-99210 • 2 Guests</p>
+                            </div>
+                        </div>
+                        <button onclick="showTicketModal()" class="bg-primary text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-red-700 transition-colors">
+                            View QR Voucher
+                        </button>
+                    </div>
+
+                    <!-- Trip 2: Past -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0">
+                                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_561fea4429_e512bc97af1eacde.png" alt="Petra" />
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">Completed • April 12, 2026</span>
+                                <h3 class="font-bold text-base mt-1">Petra Treasury & Monastery Trail</h3>
+                                <p class="text-xs text-gray-400">Ref: JOR-88412 • Guided Day Tour</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-gray-500 bg-gray-50 px-4 py-2 rounded-xl">Review Submitted ⭐ 5/5</span>
+                    </div>
+
+                    <!-- Trip 3: Past -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-2xl overflow-hidden shrink-0">
+                                <img class="w-full h-full object-cover" src="https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_873975fcc7_dae5f62a9041d6d4.png" alt="Wadi Mujib" />
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md">Completed • March 28, 2026</span>
+                                <h3 class="font-bold text-base mt-1">Wadi Mujib Siq Waterfall Canyoning</h3>
+                                <p class="text-xs text-gray-400">Ref: JOR-77290 • Adventure Pass</p>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold text-gray-500 bg-gray-50 px-4 py-2 rounded-xl">Review Submitted ⭐ 5/5</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Settings -->
+            <section id="settings-section" class="content-section p-6 lg:p-12 animate-in fade-in duration-500">
+                <h1 class="text-3xl font-bold font-heading mb-8">Account Settings</h1>
+                <div class="bg-white rounded-[2.5rem] overflow-hidden border border-gray-100 shadow-sm">
+                    <!-- Personal Security -->
+                    <div class="p-8 border-b border-gray-50">
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Security & Login</h2>
+                        <div class="space-y-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold text-sm">Two-Factor Authentication</h3>
+                                    <p class="text-xs text-gray-400">Protect account with authentication app or SMS.</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h3 class="font-bold text-sm">Change Password</h3>
+                                    <p class="text-xs text-gray-400">Last changed 45 days ago.</p>
+                                </div>
+                                <button onclick="alert('Password reset link sent to your registered email.')" class="bg-secondary text-white px-5 py-2 rounded-xl font-bold text-xs hover:bg-primary transition-all">Update</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Localization -->
+                    <div class="p-8 border-b border-gray-50">
+                        <h2 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Localization & Currency</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs font-bold mb-2">Display Language</label>
+                                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold p-3 outline-none focus:ring-1 focus:ring-primary">
+                                    <option>English (UK)</option>
+                                    <option>Arabic (Jordan) - العربية</option>
+                                    <option>French (Français)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-2">Currency</label>
+                                <select class="w-full bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold p-3 outline-none focus:ring-1 focus:ring-primary">
+                                    <option>USD ($)</option>
+                                    <option>JOD (JD - Jordanian Dinar)</option>
+                                    <option>EUR (€)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="p-8 bg-red-50/20">
+                        <h2 class="text-xs font-bold text-primary uppercase tracking-widest mb-4">Danger Zone</h2>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-bold text-sm text-secondary">Deactivate Account</h3>
+                                <p class="text-xs text-gray-400">Permanently delete saved favorites and booking history.</p>
+                            </div>
+                            <button onclick="confirm('Are you sure you want to deactivate your JordanAI account?')" class="bg-white border border-primary/20 text-primary px-5 py-2 rounded-xl font-bold text-xs hover:bg-primary hover:text-white transition-all">Deactivate</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- QR Ticket Modal -->
+    <div id="ticket-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 text-center shadow-2xl">
+            <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Digital Boarding Pass</span>
+            <h3 class="text-xl font-bold font-heading mt-1 mb-4">Dead Sea Floating & Spa</h3>
+            
+            <div class="bg-gray-50 p-6 rounded-2xl border border-dashed border-gray-200 flex flex-col items-center mb-6">
+                <!-- Simulated QR code -->
+                <div class="w-40 h-40 bg-white border border-gray-300 rounded-xl p-2 flex items-center justify-center shadow-xs">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=JORDANAI-JOR-99210-DEADSEA" alt="QR Code" class="w-full h-full object-contain" onerror="this.src='https://storage.googleapis.com/uxpilot-auth.appspot.com/gen_3d99453d23_1e586bde2d89f6c1.png'">
+                </div>
+                <p class="text-xs font-bold text-secondary mt-3">JOR-99210</p>
+                <p class="text-[11px] text-gray-400">Valid on June 18, 2026</p>
+            </div>
+
+            <button onclick="document.getElementById('ticket-modal').classList.add('hidden')" class="w-full bg-secondary text-white py-3 rounded-xl font-bold text-xs hover:bg-primary transition-colors">
+                Close Ticket
+            </button>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[60] transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-secondary text-white px-6 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3">
+            <i class="fas fa-check-circle text-green-400"></i>
+            <span class="text-xs font-bold" id="toast-msg">Profile changes saved successfully!</span>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active', 'text-white');
+                link.classList.add('text-gray-500');
+            });
+            if (element) {
+                element.classList.add('active', 'text-white');
+                element.classList.remove('text-gray-500');
+            }
+
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            const targetSection = document.getElementById(tabName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        function toggleEdit(formId) {
+            const form = document.getElementById(formId);
+            const inputs = form.querySelectorAll('input, textarea');
+            const saveActions = document.getElementById('save-actions');
+            const editBtn = document.getElementById('edit-btn');
+
+            const isEditing = !inputs[0].readOnly;
+
+            inputs.forEach(input => {
+                input.readOnly = isEditing;
+                if (!isEditing) {
+                    input.classList.remove('bg-gray-50');
+                    input.classList.add('bg-white', 'ring-1', 'ring-primary/20');
+                } else {
+                    input.classList.add('bg-gray-50');
+                    input.classList.remove('bg-white', 'ring-1', 'ring-primary/20');
+                }
+            });
+
+            saveActions.classList.toggle('hidden');
+            editBtn.classList.toggle('hidden');
+        }
+
+        function saveChanges() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toggleEdit('profile-form');
+            }, 2000);
+        }
+
+        function showTicketModal() {
+            document.getElementById('ticket-modal').classList.remove('hidden');
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        });
+    </script>
+</body>
+</html>
